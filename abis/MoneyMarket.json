@@ -1,0 +1,587 @@
+[
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "MULTIPLIER",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "newLoanAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setLoan",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "recordId",
+        "type": "uint256"
+      },
+      {
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "totalBorrows",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "recordId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getSavingsRecord",
+    "outputs": [
+      {
+        "components": [
+          {
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "name": "interestRate",
+            "type": "uint256"
+          },
+          {
+            "name": "balance",
+            "type": "uint256"
+          },
+          {
+            "name": "principal",
+            "type": "uint256"
+          },
+          {
+            "name": "initialTimestamp",
+            "type": "uint256"
+          },
+          {
+            "name": "lastTimestamp",
+            "type": "uint256"
+          }
+        ],
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getSavingsRecordIds",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "savingsCalculator",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "isOwner",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "totalFunds",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "deposit",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getRawSavingsRecords",
+    "outputs": [
+      {
+        "components": [
+          {
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "name": "interestRate",
+            "type": "uint256"
+          },
+          {
+            "name": "balance",
+            "type": "uint256"
+          },
+          {
+            "name": "principal",
+            "type": "uint256"
+          },
+          {
+            "name": "initialTimestamp",
+            "type": "uint256"
+          },
+          {
+            "name": "lastTimestamp",
+            "type": "uint256"
+          }
+        ],
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getSavingsRecords",
+    "outputs": [
+      {
+        "components": [
+          {
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "name": "interestRate",
+            "type": "uint256"
+          },
+          {
+            "name": "balance",
+            "type": "uint256"
+          },
+          {
+            "name": "principal",
+            "type": "uint256"
+          },
+          {
+            "name": "initialTimestamp",
+            "type": "uint256"
+          },
+          {
+            "name": "lastTimestamp",
+            "type": "uint256"
+          }
+        ],
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "calculator",
+        "type": "address"
+      }
+    ],
+    "name": "loan",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "recordId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getRawSavingsRecord",
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "name": "interestRate",
+            "type": "uint256"
+          },
+          {
+            "name": "balance",
+            "type": "uint256"
+          },
+          {
+            "name": "principal",
+            "type": "uint256"
+          },
+          {
+            "name": "initialTimestamp",
+            "type": "uint256"
+          },
+          {
+            "name": "lastTimestamp",
+            "type": "uint256"
+          }
+        ]
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "calculator",
+        "type": "address"
+      }
+    ],
+    "name": "setSavingsCalculator",
+    "outputs": [
+      {
+        "components": [
+          {
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "name": "interestRate",
+            "type": "uint256"
+          },
+          {
+            "name": "balance",
+            "type": "uint256"
+          },
+          {
+            "name": "principal",
+            "type": "uint256"
+          },
+          {
+            "name": "initialTimestamp",
+            "type": "uint256"
+          },
+          {
+            "name": "lastTimestamp",
+            "type": "uint256"
+          }
+        ],
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "assetAddress",
+        "type": "address"
+      },
+      {
+        "name": "savingsInterestCalculatorAddress",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "fallback"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "recordId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "balance",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "rate",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "SavingsDeposited",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "recordId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "remainingBalance",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "SavingsWithdrawn",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "previousCalculator",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "name": "newCalculator",
+        "type": "address"
+      }
+    ],
+    "name": "SavingsCalculatorChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "previousLoan",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "name": "newLoan",
+        "type": "address"
+      }
+    ],
+    "name": "LoanChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "previousLoan",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "name": "newLoan",
+        "type": "address"
+      }
+    ],
+    "name": "LoanChanged",
+    "type": "event"
+  }
+]

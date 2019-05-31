@@ -1,0 +1,11 @@
+{
+  "extends": "solhint:recommended",
+  "rules": {
+    "indent": ["error", 4],
+
+    "compiler-fixed": false,
+    "no-simple-event-func-name": false,
+    "separate-by-one-line-in-contract": false,
+    "two-lines-top-level-separator": false
+  }
+}

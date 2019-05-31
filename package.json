@@ -1,0 +1,48 @@
+{
+  "name": "@alice-finance/money-market",
+  "description": "Decentralized Money Market",
+  "version": "0.1.0",
+  "files": [
+    "abis",
+    "contracts",
+    "networks"
+  ],
+  "repository": "https://github.com/alice-finance/money-market",
+  "bugs": {
+    "url": "https://github.com/alice-finance/money-market"
+  },
+  "homepage": "https://github.com/alice-finance/money-market",
+  "author": "Changhwan Choi <changhwan@dnext.co>",
+  "license": "MIT",
+  "scripts": {
+    "build": "./node_modules/.bin/truffle compile --all && node scripts/build.js",
+    "test": "./node_modules/.bin/truffle test",
+    "test:coverage": "./node_modules/.bin/solidity-coverage",
+    "prettier": "./node_modules/.bin/prettier contracts/**/*.sol --write ",
+    "prettier:js": "./node_modules/.bin/prettier test/**/*.js --write --print-width 120",
+    "compile": "./node_modules/.bin/truffle compile"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn build"
+    }
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-bn": "^0.1.1",
+    "dotenv": "^8.0.0",
+    "eth-gas-reporter": "^0.2.0",
+    "ganache-cli": "^6.4.3",
+    "husky": "^2.3.0",
+    "loom-js": "^1.51.1",
+    "loom-truffle-provider": "^0.13.0",
+    "openzeppelin-solidity": "^2.2.0",
+    "openzeppelin-test-helpers": "^0.4.0",
+    "prettier": "^1.17.1",
+    "prettier-plugin-solidity": "^1.0.0-alpha.22",
+    "solhint": "^2.0.0",
+    "solidity-coverage": "^0.5.11",
+    "truffle": "^5.0.19",
+    "truffle-security": "^1.4.4"
+  }
+}
