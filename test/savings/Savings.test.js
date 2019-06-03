@@ -3,6 +3,8 @@ const { expect } = require("chai");
 
 const MoneyMarket = artifacts.require("MoneyMarket.sol");
 const ERC20 = artifacts.require("mock/ERC20Mock.sol");
+const ERC20Invalid = artifacts.require("mock/ERC20MockInvalid.sol");
+const ERC20Fails = artifacts.require("mock/ERC20MockFails.sol");
 const Calculator = artifacts.require("calculator/SavingsInterestCalculatorV1.sol");
 const TrustlessOwner = artifacts.require("ownership/TrustlessOwnerMock.sol");
 
@@ -27,18 +29,18 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
     this.calculator = await Calculator.new();
     this.owner = await TrustlessOwner.new();
 
-    users = [user1, user2, user3, not_allowed_user];
+    this.users = [user1, user2, user3, not_allowed_user];
 
-    for (const [i, u] of users.entries()) {
+    for (const [i, u] of this.users.entries()) {
       await this.dai.mint(u, MAX_AMOUNT, { from: owner });
     }
   });
 
   beforeEach(async function() {
     this.market = await MoneyMarket.new(this.dai.address, this.calculator.address);
-    this.market.transferOwnership(this.owner.address, { from: owner });
+    await this.market.transferOwnership(this.owner.address, { from: owner });
 
-    for (const [i, u] of users.slice(0, 3).entries()) {
+    for (const [i, u] of this.users.slice(0, 3).entries()) {
       await this.dai.approve(this.market.address, MAX_UINT256, { from: u });
     }
   });
@@ -123,12 +125,40 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
       it("should not deposit when user does not approved bank", async function() {
         await expectRevert(this.market.deposit(AMOUNT1, { from: not_allowed_user }), "allowance not met");
       });
+
+      it("should not deposit when ERC20.transferFrom() fails", async function() {
+        const erc20fails = await ERC20Fails.new("ERC20 Fails", "Fail", 18);
+        let market = await MoneyMarket.new(erc20fails.address, this.calculator.address);
+        await market.transferOwnership(this.owner.address, { from: owner });
+
+        await erc20fails.mint(user1, MAX_AMOUNT, { from: owner });
+        await erc20fails.approve(market.address, MAX_UINT256, { from: user1 });
+        await erc20fails.setShouldFail(true);
+
+        await expectRevert(market.deposit(AMOUNT1, { from: user1 }), "transferFrom failed");
+
+        await erc20fails.setShouldRevert(true);
+        await expectRevert(market.deposit(AMOUNT1, { from: user1 }), "Token reverts");
+      });
+
+      it("should not deposit when ERC20 is Invalid", async function() {
+        const erc20invalid = await ERC20Invalid.new("ERC20 Invalid", "Invalid", 18);
+        let market = await MoneyMarket.new(erc20invalid.address, this.calculator.address);
+        await market.transferOwnership(this.owner.address, { from: owner });
+
+        await erc20invalid.mint(user1, MAX_AMOUNT, { from: owner });
+        await erc20invalid.approve(market.address, MAX_UINT256, { from: user1 });
+
+        // @dev just revert because IERC20 specifies transferFrom returns bool, but
+        // ERC20Invalid's transferFrom returns nothing
+        await expectRevert.unspecified(market.deposit(AMOUNT1, { from: user1 }));
+      });
     });
 
     context("with deposit", function() {
-      it("should not get savings record when savingsId is invalid", async function () {
-        await expectRevert(this.market.getSavingsRecord(25), "invalid recordId")
-        await expectRevert(this.market.getRawSavingsRecord(25), "invalid recordId")
+      it("should not get savings record when savingsId is invalid", async function() {
+        await expectRevert(this.market.getSavingsRecord(25), "invalid recordId");
+        await expectRevert(this.market.getRawSavingsRecord(25), "invalid recordId");
       });
 
       context("should withdraw", function() {
@@ -266,6 +296,24 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
 
         record = await this.market.getSavingsRecord(2);
         await expectRevert(this.market.withdraw(2, record.balance, { from: user3 }), "insufficient fund");
+      });
+
+      it("when ERC20.transfer fails", async function() {
+        const erc20fails = await ERC20Fails.new("ERC20 Fails", "Fail", 18);
+        let market = await MoneyMarket.new(erc20fails.address, this.calculator.address);
+        await market.transferOwnership(this.owner.address, { from: owner });
+
+        await erc20fails.mint(user1, MAX_AMOUNT, { from: owner });
+        await erc20fails.approve(market.address, MAX_UINT256, { from: user1 });
+        await erc20fails.setShouldFail(false);
+
+        await market.deposit(AMOUNT1, { from: user1 });
+        await erc20fails.setShouldFail(true);
+
+        await expectRevert(market.withdraw(0, AMOUNT1, { from: user1 }), "transfer failed");
+
+        await erc20fails.setShouldRevert(true);
+        await expectRevert(market.withdraw(0, AMOUNT1, { from: user1 }), "Token reverts");
       });
     });
   });

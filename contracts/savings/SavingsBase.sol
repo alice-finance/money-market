@@ -59,7 +59,10 @@ contract SavingsBase is FallbackDispatcher {
             "allowance not met"
         );
 
-        _asset.transferFrom(user, address(this), amount);
+        require(
+            _asset.transferFrom(user, address(this), amount),
+            "transferFrom failed"
+        );
 
         emit SavingsDeposited(
             recordId,
@@ -96,7 +99,7 @@ contract SavingsBase is FallbackDispatcher {
         record.balance = currentBalance.sub(amount);
         record.lastTimestamp = block.timestamp;
 
-        _asset.transfer(user, amount);
+        require(_asset.transfer(user, amount), "transfer failed");
 
         emit SavingsWithdrawn(
             recordId,
