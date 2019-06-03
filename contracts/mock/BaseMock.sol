@@ -11,6 +11,8 @@ contract BaseMock is Base {
 
         _totalBorrows = 100;
         _totalFunds = 200;
+
+        _guardCounter = 1;
     }
 
     function prohibitedFunction() public view onlyOwner returns (bool) {
