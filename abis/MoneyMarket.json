@@ -461,7 +461,7 @@
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "name": "owner",
         "type": "address"
       },
@@ -493,7 +493,7 @@
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "name": "owner",
         "type": "address"
       },

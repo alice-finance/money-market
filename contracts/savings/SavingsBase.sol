@@ -12,7 +12,7 @@ contract SavingsBase is FallbackDispatcher {
     /** Events */
     event SavingsDeposited(
         uint256 recordId,
-        address owner,
+        address indexed owner,
         uint256 balance,
         uint256 rate,
         uint256 timestamp
@@ -20,7 +20,7 @@ contract SavingsBase is FallbackDispatcher {
 
     event SavingsWithdrawn(
         uint256 recordId,
-        address owner,
+        address indexed owner,
         uint256 amount,
         uint256 remainingBalance,
         uint256 timestamp
