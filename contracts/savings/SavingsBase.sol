@@ -117,7 +117,7 @@ contract SavingsBase is FallbackDispatcher {
         view
         returns (uint256)
     {
-        return _savingsInterestCalculator.getCurrentBalance(
+        return _savingsInterestCalculator.getExpectedBalance(
             record.balance,
             record.interestRate,
             block.timestamp - record.lastTimestamp

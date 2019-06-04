@@ -7,7 +7,7 @@ contract IInterestCalculator {
         uint256 amount
     ) public pure returns (uint256);
 
-    function getCurrentBalance(
+    function getExpectedBalance(
         uint256 principal,
         uint256 rate,
         uint256 timeDelta

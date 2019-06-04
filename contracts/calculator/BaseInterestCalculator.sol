@@ -14,7 +14,7 @@ contract BaseInterestCalculator is IInterestCalculator {
         revert("not implemented");
     }
 
-    function getCurrentBalance(
+    function getExpectedBalance(
         uint256 principal,
         uint256 rate,
         uint256 timeDelta

@@ -7,7 +7,7 @@ async function getCalculatorBalance(principal, rate, terms) {
   const convertedTerms = terms * 86400;
   const convertedRate = this.MULTIPLIER.mul(new BN(rate * 100000)).div(new BN(100000));
 
-  return await this.calculator.getCurrentBalance(principal, convertedRate, convertedTerms);
+  return await this.calculator.getExpectedBalance(principal, convertedRate, convertedTerms);
 }
 
 function getExpectedBalance(principal, rate, terms) {
