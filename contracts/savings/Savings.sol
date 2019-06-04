@@ -79,4 +79,12 @@ contract Savings is SavingsBase {
         require(recordId < _savingsRecords.length, "invalid recordId");
         return _savingsRecords[recordId];
     }
+
+    function getCurrentSavingsInterestRate()
+        public
+        view
+        returns (uint256)
+    {
+        return _calculateSavingsInterestRate(MULTIPLIER);
+    }
 }

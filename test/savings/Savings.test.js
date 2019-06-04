@@ -50,6 +50,17 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
     expect(asset).to.be.equal(this.dai.address);
   });
 
+  it("should get same interest rate", async function() {
+    let expectedRate = await this.calculator.getInterestRate(
+      await this.market.totalFunds(),
+      0,
+      await this.market.MULTIPLIER()
+    );
+    let expectedRate2 = await this.market.getCurrentSavingsInterestRate();
+
+    expect(expectedRate).to.be.bignumber.equal(expectedRate2);
+  });
+
   context("saving", function() {
     context("deposit", function() {
       it("should deposit ", async function() {
