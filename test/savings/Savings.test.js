@@ -45,6 +45,11 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
     }
   });
 
+  it("should get same asset", async function() {
+    const asset = await this.market.asset();
+    expect(asset).to.be.equal(this.dai.address);
+  });
+
   context("saving", function() {
     context("deposit", function() {
       it("should deposit ", async function() {

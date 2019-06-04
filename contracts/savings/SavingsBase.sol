@@ -53,14 +53,14 @@ contract SavingsBase is FallbackDispatcher {
 
         _totalFunds = _totalFunds.add(amount);
 
-        require(_asset.balanceOf(user) >= amount, "insufficient fund");
+        require(asset().balanceOf(user) >= amount, "insufficient fund");
         require(
-            _asset.allowance(user, address(this)) >= amount,
+            asset().allowance(user, address(this)) >= amount,
             "allowance not met"
         );
 
         require(
-            _asset.transferFrom(user, address(this), amount),
+            asset().transferFrom(user, address(this), amount),
             "transferFrom failed"
         );
 
@@ -89,7 +89,7 @@ contract SavingsBase is FallbackDispatcher {
         uint256 currentBalance = _getCurrentSavingsBalance(record);
 
         require(currentBalance >= amount, "insufficient balance");
-        require(_asset.balanceOf(address(this)) >= amount, "insufficient fund");
+        require(asset().balanceOf(address(this)) >= amount, "insufficient fund");
 
         _totalFunds = _totalFunds.sub(record.balance).add(currentBalance).sub(
             amount
@@ -99,7 +99,7 @@ contract SavingsBase is FallbackDispatcher {
         record.balance = currentBalance.sub(amount);
         record.lastTimestamp = block.timestamp;
 
-        require(_asset.transfer(user, amount), "transfer failed");
+        require(asset().transfer(user, amount), "transfer failed");
 
         emit SavingsWithdrawn(
             recordId,

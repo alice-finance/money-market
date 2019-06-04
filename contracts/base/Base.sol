@@ -77,6 +77,10 @@ contract Base {
         require(localCounter == _guardCounter, "nonReentrant");
     }
 
+    function asset() public view returns (IERC20) {
+        return _asset;
+    }
+
     function loan() public view returns (address) {
         return _loan;
     }
