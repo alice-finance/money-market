@@ -14,6 +14,20 @@
     "type": "function"
   },
   {
+    "constant": true,
+    "inputs": [],
+    "name": "asset",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "constant": false,
     "inputs": [
       {
@@ -107,6 +121,20 @@
         ],
         "name": "",
         "type": "tuple"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getCurrentSavingsInterestRate",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
       }
     ],
     "payable": false,
@@ -307,12 +335,7 @@
   },
   {
     "constant": true,
-    "inputs": [
-      {
-        "name": "calculator",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "loan",
     "outputs": [
       {
@@ -335,8 +358,6 @@
     "name": "getRawSavingsRecord",
     "outputs": [
       {
-        "name": "",
-        "type": "tuple",
         "components": [
           {
             "name": "id",
@@ -366,7 +387,9 @@
             "name": "lastTimestamp",
             "type": "uint256"
           }
-        ]
+        ],
+        "name": "",
+        "type": "tuple"
       }
     ],
     "payable": false,
@@ -382,38 +405,7 @@
       }
     ],
     "name": "setSavingsCalculator",
-    "outputs": [
-      {
-        "components": [
-          {
-            "name": "owner",
-            "type": "address"
-          },
-          {
-            "name": "interestRate",
-            "type": "uint256"
-          },
-          {
-            "name": "balance",
-            "type": "uint256"
-          },
-          {
-            "name": "principal",
-            "type": "uint256"
-          },
-          {
-            "name": "initialTimestamp",
-            "type": "uint256"
-          },
-          {
-            "name": "lastTimestamp",
-            "type": "uint256"
-          }
-        ],
-        "name": "",
-        "type": "tuple"
-      }
-    ],
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -548,23 +540,6 @@
       }
     ],
     "name": "SavingsCalculatorChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "name": "previousLoan",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "name": "newLoan",
-        "type": "address"
-      }
-    ],
-    "name": "LoanChanged",
     "type": "event"
   },
   {
