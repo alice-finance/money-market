@@ -87,4 +87,16 @@ contract Savings is SavingsBase {
     {
         return _calculateSavingsInterestRate(MULTIPLIER);
     }
+
+    function getAPR()
+        public
+        view
+        returns (uint256)
+    {
+        return _savingsInterestCalculator.getExpectedBalance(
+            MULTIPLIER,
+            _calculateSavingsInterestRate(MULTIPLIER),
+            365 days
+        ) - MULTIPLIER;
+    }
 }
