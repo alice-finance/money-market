@@ -45,6 +45,14 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
     }
   });
 
+  it("should get right information", async function() {
+    const decimals = await this.market.DECIMALS();
+    expect(decimals).to.be.bignumber.equal(new BN(18));
+
+    const multiplier = await this.market.MULTIPLIER();
+    expect(multiplier).to.be.bignumber.equal(MULTIPLIER);
+  });
+
   it("should get same asset", async function() {
     const asset = await this.market.asset();
     expect(asset).to.be.equal(this.dai.address);

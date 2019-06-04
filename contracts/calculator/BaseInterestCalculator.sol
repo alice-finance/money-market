@@ -3,7 +3,8 @@ pragma solidity 0.5.8;
 import "./IInterestCalculator.sol";
 
 contract BaseInterestCalculator is IInterestCalculator {
-    uint256 public constant MULTIPLIER = 10 ** 18;
+    uint256 public constant DECIMALS = 18;
+    uint256 public constant MULTIPLIER = 10 ** DECIMALS;
 
     function getInterestRate(
         uint256, /* totalSavings */

@@ -5,7 +5,8 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "../calculator/IInterestCalculator.sol";
 
 contract Base {
-    uint256 public constant MULTIPLIER = 10 ** 18;
+    uint256 public constant DECIMALS = 18;
+    uint256 public constant MULTIPLIER = 10 ** DECIMALS;
 
     address internal _owner;
     IERC20 internal _asset;
