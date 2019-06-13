@@ -455,6 +455,10 @@
   {
     "inputs": [
       {
+        "name": "ownerAddress",
+        "type": "address"
+      },
+      {
         "name": "assetAddress",
         "type": "address"
       },

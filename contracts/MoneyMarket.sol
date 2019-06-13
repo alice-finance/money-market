@@ -4,10 +4,10 @@ pragma experimental ABIEncoderV2;
 import "./savings/Savings.sol";
 
 contract MoneyMarket is Savings {
-    constructor(address assetAddress, address savingsInterestCalculatorAddress)
+    constructor(address ownerAddress, address assetAddress, address savingsInterestCalculatorAddress)
         public
     {
-        _owner = msg.sender;
+        _owner = ownerAddress;
         _asset = IERC20(assetAddress);
         _savingsInterestCalculator = IInterestCalculator(
             savingsInterestCalculatorAddress

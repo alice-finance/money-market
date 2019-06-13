@@ -4,7 +4,6 @@ pragma experimental ABIEncoderV2;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "../base/FallbackDispatcher.sol";
-import "../ownership/TrustlessOwner.sol";
 
 contract SavingsBase is FallbackDispatcher {
     using SafeMath for uint256;

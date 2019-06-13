@@ -6,9 +6,8 @@ const ERC20 = artifacts.require("mock/ERC20Mock.sol");
 const ERC20Invalid = artifacts.require("mock/ERC20MockInvalid.sol");
 const ERC20Fails = artifacts.require("mock/ERC20MockFails.sol");
 const Calculator = artifacts.require("calculator/SavingsInterestCalculatorV1.sol");
-const TrustlessOwner = artifacts.require("ownership/TrustlessOwnerMock.sol");
 
-const { ZERO_ADDRESS, MAX_UINT256 } = constants;
+const { MAX_UINT256 } = constants;
 
 const ZERO = new BN(0);
 const MULTIPLIER = new BN(10).pow(new BN(18));
@@ -27,7 +26,6 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
   before(async function() {
     this.dai = await ERC20.new("DAI Stable Token", "DAI", 18);
     this.calculator = await Calculator.new();
-    this.owner = await TrustlessOwner.new();
 
     this.users = [user1, user2, user3, not_allowed_user];
 
@@ -37,8 +35,7 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
   });
 
   beforeEach(async function() {
-    this.market = await MoneyMarket.new(this.dai.address, this.calculator.address);
-    await this.market.transferOwnership(this.owner.address, { from: owner });
+    this.market = await MoneyMarket.new(owner, this.dai.address, this.calculator.address);
 
     for (const [i, u] of this.users.slice(0, 3).entries()) {
       await this.dai.approve(this.market.address, MAX_UINT256, { from: u });
@@ -162,8 +159,7 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
 
       it("should not deposit when ERC20.transferFrom() fails", async function() {
         const erc20fails = await ERC20Fails.new("ERC20 Fails", "Fail", 18);
-        let market = await MoneyMarket.new(erc20fails.address, this.calculator.address);
-        await market.transferOwnership(this.owner.address, { from: owner });
+        let market = await MoneyMarket.new(owner, erc20fails.address, this.calculator.address);
 
         await erc20fails.mint(user1, MAX_AMOUNT, { from: owner });
         await erc20fails.approve(market.address, MAX_UINT256, { from: user1 });
@@ -177,8 +173,7 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
 
       it("should not deposit when ERC20 is Invalid", async function() {
         const erc20invalid = await ERC20Invalid.new("ERC20 Invalid", "Invalid", 18);
-        let market = await MoneyMarket.new(erc20invalid.address, this.calculator.address);
-        await market.transferOwnership(this.owner.address, { from: owner });
+        let market = await MoneyMarket.new(owner, erc20invalid.address, this.calculator.address);
 
         await erc20invalid.mint(user1, MAX_AMOUNT, { from: owner });
         await erc20invalid.approve(market.address, MAX_UINT256, { from: user1 });
@@ -334,8 +329,7 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
 
       it("when ERC20.transfer fails", async function() {
         const erc20fails = await ERC20Fails.new("ERC20 Fails", "Fail", 18);
-        let market = await MoneyMarket.new(erc20fails.address, this.calculator.address);
-        await market.transferOwnership(this.owner.address, { from: owner });
+        let market = await MoneyMarket.new(owner, erc20fails.address, this.calculator.address);
 
         await erc20fails.mint(user1, MAX_AMOUNT, { from: owner });
         await erc20fails.approve(market.address, MAX_UINT256, { from: user1 });

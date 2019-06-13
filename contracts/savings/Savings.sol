@@ -4,19 +4,14 @@ pragma experimental ABIEncoderV2;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./SavingsBase.sol";
-import "../ownership/TrustlessOwner.sol";
 
 contract Savings is SavingsBase {
     function deposit(uint256 amount) public returns (uint256) {
-        uint256 result = _deposit(msg.sender, amount);
-        TrustlessOwner(_owner).executePendingTransactions();
-        return result;
+        return _deposit(msg.sender, amount);
     }
 
     function withdraw(uint256 recordId, uint256 amount) public returns (bool) {
-        bool result = _withdraw(msg.sender, recordId, amount);
-        TrustlessOwner(_owner).executePendingTransactions();
-        return result;
+        return _withdraw(msg.sender, recordId, amount);
     }
 
     function getSavingsRecordIds(address user)
