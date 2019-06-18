@@ -65,15 +65,33 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
 
     expect(expectedRate).to.be.bignumber.equal(expectedRate2);
 
+    let expectedRate3 = await this.calculator.getInterestRate(
+      await this.market.totalFunds(),
+      0,
+      AMOUNT3
+    );
+    let expectedRate4 = await this.market.getExpectedSavingsInterestRate(AMOUNT3);
+
+    expect(expectedRate3).to.be.bignumber.equal(expectedRate4);
+
     let expectedAPR = (await this.calculator.getExpectedBalance(
       MULTIPLIER,
       expectedRate,
       365 * 86400
     )).sub(MULTIPLIER);
-    let expectedAPR2 = await this.market.getAPR();
+    let expectedAPR2 = await this.market.getCurrentSavingsAPR();
 
     expect(expectedAPR).to.be.bignumber.equal(expectedAPR2);
 
+    let expectedAPR3 = (await this.calculator.getExpectedBalance(
+      MULTIPLIER,
+      expectedRate3,
+      365 * 86400
+    )).sub(MULTIPLIER);
+
+    let expectedAPR4 = await this.market.getExpectedSavingsAPR(AMOUNT3);
+
+    expect(expectedAPR3).to.be.bignumber.equal(expectedAPR4);
   });
 
   context("saving", function() {
