@@ -7,13 +7,15 @@ contract SavingsInterestCalculatorV1 is BaseInterestCalculator {
         int256 CM;
         int256 CMAX;
         int256 X;
+        int256 V;
+        int256 A;
         int256 PI;
     }
 
     function getInterestRate(
         uint256 totalSavings,
         uint256, /* totalBorrows */
-        uint256 /* amount */
+        uint256 amount
     ) public pure returns (uint256) {
         /**
         Algorithm
@@ -39,15 +41,22 @@ contract SavingsInterestCalculatorV1 is BaseInterestCalculator {
             10 ** 18,
             0,
             0,
+            0,
+            0,
             3141592653589793238
         );
-        params.CMAX = 1700000 * params.CM;
+        params.CMAX = 2000000 * params.CM;
         params.X = int256(totalSavings);
+        params.V = int256(amount);
+        params.A = params.V / 2;
 
         // return 0 when overflowed
         if (params.X < 0) return 0;
         // return 0 when totalSavings over MAX
         if (params.X >= params.CMAX) return 0;
+        if (params.X + params.A >= params.CMAX) return 0;
+
+        params.X += params.A;
 
         int256 v = (params.X * params.PI) / params.CMAX;
         int256 z = v * v / params.CM;

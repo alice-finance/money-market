@@ -79,7 +79,7 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
   context("saving", function() {
     context("deposit", function() {
       it("should deposit ", async function() {
-        let expectedRate = await this.calculator.getInterestRate(await this.market.totalFunds(), 0, 0);
+        let expectedRate = await this.calculator.getInterestRate(await this.market.totalFunds(), 0, AMOUNT1);
 
         let { logs } = await this.market.deposit(AMOUNT1, { from: user1 });
 
@@ -94,7 +94,7 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
         expect(new BN(record.balance)).to.be.bignumber.equal(AMOUNT1);
         expect(new BN(record.interestRate)).to.be.bignumber.equal(expectedRate);
 
-        expectedRate = await this.calculator.getInterestRate(await this.market.totalFunds(), 0, 0);
+        expectedRate = await this.calculator.getInterestRate(await this.market.totalFunds(), 0, AMOUNT2);
         ({ logs } = await this.market.deposit(AMOUNT2, { from: user1 }));
 
         expectEvent.inLogs(logs, "SavingsDeposited", {
@@ -108,7 +108,7 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
         expect(new BN(record.balance)).to.be.bignumber.equal(AMOUNT2);
         expect(new BN(record.interestRate)).to.be.bignumber.equal(expectedRate);
 
-        expectedRate = await this.calculator.getInterestRate(await this.market.totalFunds(), 0, 0);
+        expectedRate = await this.calculator.getInterestRate(await this.market.totalFunds(), 0, AMOUNT3);
         ({ logs } = await this.market.deposit(AMOUNT3, { from: user1 }));
 
         expectEvent.inLogs(logs, "SavingsDeposited", {

@@ -17,8 +17,8 @@ contract("SavingsInterestCalculatorV1", function([owner]) {
   it("should get interest rate", async function() {
     const INITIAL_EXPECTED_RATE = new BN("210874398376755");
     const HALF_EXPECTED_RATE = new BN("105437418902571");
-    const MAX_SAVINGS = this.MULTIPLIER.mul(new BN("1700000"));
-    const HALF_SAVINGS = this.MULTIPLIER.mul(new BN("850000"));
+    const MAX_SAVINGS = this.MULTIPLIER.mul(new BN("2000000"));
+    const HALF_SAVINGS = this.MULTIPLIER.mul(new BN("1000000"));
     const OVER_SAVINGS = MAX_SAVINGS.add(this.MULTIPLIER.mul(new BN(100000)));
     const OVERFLOW_SAVINGS = MAX_UINT256;
     const FINAL_EXPECTED_RATE = new BN(0);
@@ -32,6 +32,14 @@ contract("SavingsInterestCalculatorV1", function([owner]) {
     expect(rate).to.be.bignumber.equal(HALF_EXPECTED_RATE);
 
     rate = await this.calculator.getInterestRate(MAX_SAVINGS, 0, 0);
+
+    expect(rate).to.be.bignumber.equal(FINAL_EXPECTED_RATE);
+
+    rate = await this.calculator.getInterestRate(0, 0, MAX_SAVINGS);
+
+    expect(rate).to.be.bignumber.equal(HALF_EXPECTED_RATE);
+
+    rate = await this.calculator.getInterestRate(HALF_SAVINGS, 0, MAX_SAVINGS)
 
     expect(rate).to.be.bignumber.equal(FINAL_EXPECTED_RATE);
 
