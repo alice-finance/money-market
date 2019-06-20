@@ -1,3 +1,4 @@
+require("dotenv").config();
 const MoneyMarket = artifacts.require("MoneyMarket.sol");
 const SavingsInterestCalculator = artifacts.require("calculator/SavingsInterestCalculatorV1.sol");
 const ERC20Mock = artifacts.require("mock/ERC20Mock.sol");
@@ -20,9 +21,9 @@ module.exports = async function(deployer, network, [admin]) {
 
     ownerAddress = admin;
 
-  } else if (network == "extdev") {
-    daiAddress = "0xCeCd059CDe0138Cb681fF9bf9445a0a2CC9e98cb";
-    ownerAddress = "0x3F887AaFCed05ea8fC16390624Cb6B7f588Ccb2a";
+  } else if (["extdev", "plasma"].includes(network)) {
+    daiAddress = process.env.DAI_ADDRESS
+    ownerAddress = process.env.OWNER_ADDRESS
   } else {
     throw Error("Network Error");
   }
