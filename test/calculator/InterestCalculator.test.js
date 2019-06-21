@@ -39,12 +39,10 @@ contract("BaseInterestCalculator", function([owner]) {
     result = await getBalance(principal, rate, 0);
 
     expect(result).to.be.bignumber.equal(new BN(principal));
-  });
 
-  it("should fail to get current balance when rate is ZERO", async function() {
-    const getBalance = getCalculatorBalance.bind(this);
+    result = await getBalance(principal, 0, 0);
 
-    await expectRevert(getBalance(100, 0, 10), "invalid rate");
+    expect(result).to.be.bignumber.equal(new BN(principal));
   });
 
   it("should fail to get interest rate on BaseInterestCalculator", async function() {

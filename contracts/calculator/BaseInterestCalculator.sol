@@ -19,7 +19,9 @@ contract BaseInterestCalculator is IInterestCalculator {
         uint256 rate,
         uint256 timeDelta
     ) public pure returns (uint256) {
-        require(rate > 0, "invalid rate");
+        if (rate == 0) {
+            return principal;
+        }
 
         uint256 terms = timeDelta / 86400;
 
