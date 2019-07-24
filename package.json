@@ -41,7 +41,7 @@
     "prettier": "^1.17.1",
     "prettier-plugin-solidity": "^1.0.0-alpha.22",
     "solhint": "^2.0.0",
-    "solidity-coverage": "^0.5.11",
+    "solidity-coverage": "^0.6.0",
     "truffle": "^5.0.19",
     "truffle-security": "^1.4.4"
   }
