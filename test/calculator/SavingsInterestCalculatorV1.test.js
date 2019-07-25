@@ -39,7 +39,7 @@ contract("SavingsInterestCalculatorV1", function([owner]) {
 
     expect(rate).to.be.bignumber.equal(HALF_EXPECTED_RATE);
 
-    rate = await this.calculator.getInterestRate(HALF_SAVINGS, 0, MAX_SAVINGS)
+    rate = await this.calculator.getInterestRate(HALF_SAVINGS, 0, MAX_SAVINGS);
 
     expect(rate).to.be.bignumber.equal(FINAL_EXPECTED_RATE);
 
