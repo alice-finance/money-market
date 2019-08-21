@@ -14,15 +14,15 @@ All contracts are deployed on Loom Network's [PlasmaChain](https://loomx.io/deve
 
 | Contract                    | Address                                                      |
 | --------------------------- | ------------------------------------------------------------ |
-| MoneyMarket                 | [`0x1Fe7A4F1F8b8528c4cf55990f78cB38d203ADE73`](http://plasma-blockexplorer.dappchains.com/address/0x1fe7a4f1f8b8528c4cf55990f78cb38d203ade73/transactions) |
-| SavingsInterestCalculatorV1 | [`0xBfe5fc58c3F12A5dd750a5D686DC1Ae8095c279B`](http://plasma-blockexplorer.dappchains.com/address/0xbfe5fc58c3f12a5dd750a5d686dc1ae8095c279b/transactions) |
+| MoneyMarket                 | [`0x1Fe7A4F1F8b8528c4cf55990f78cB38d203ADE73`](https://loom-blockexplorer.dappchains.com/address/0x1fe7a4f1f8b8528c4cf55990f78cb38d203ade73/transactions) |
+| SavingsInterestCalculatorV1 | [`0xBfe5fc58c3F12A5dd750a5D686DC1Ae8095c279B`](https://loom-blockexplorer.dappchains.com/address/0xbfe5fc58c3f12a5dd750a5d686dc1ae8095c279b/transactions) |
 
 And these are addresses of the assets we are using in Money Market
 
 | Asset          | Network     | Address                                                      |
 | -------------- | ----------- | ------------------------------------------------------------ |
 | DAI Stablecoin | Ethereum    | [`0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359`](https://etherscan.io/address/0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359) |
-|                | PlasmaChain | [`0xc377ce132f561364390974af13d4715f8b744319`](http://plasma-blockexplorer.dappchains.com/address/0xc377ce132f561364390974af13d4715f8b744319/transactions) |
+|                | PlasmaChain | [`0xc377ce132f561364390974af13d4715f8b744319`](https://loom-blockexplorer.dappchains.com/address/0xc377ce132f561364390974af13d4715f8b744319/transactions) |
 
 ## Development
 
