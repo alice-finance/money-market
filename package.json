@@ -16,7 +16,7 @@
   "license": "MIT",
   "scripts": {
     "build": "./node_modules/.bin/truffle compile --all && node scripts/build.js",
-    "test": "./node_modules/.bin/truffle test",
+    "test": "scripts/test.sh",
     "test:coverage": "./node_modules/.bin/solidity-coverage",
     "prettier": "./node_modules/.bin/prettier contracts/**/*.sol --write ",
     "prettier:js": "./node_modules/.bin/prettier test/**/*.js --write --print-width 120",

@@ -1,0 +1,18 @@
+{
+  "bracketSpacing": true,
+  "endOfLine": "lf",
+  "overrides": [
+    {
+      "files": "*.js",
+      "options": {
+        "printWidth": 120
+      }
+    },
+    {
+      "files": "*.sol",
+      "options": {
+        "printWidth": 80
+      }
+    }
+  ]
+}

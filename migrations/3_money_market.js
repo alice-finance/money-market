@@ -20,12 +20,12 @@ module.exports = async function(deployer, network, [admin]) {
     }
 
     ownerAddress = admin;
-
   } else if (["extdev", "plasma"].includes(network)) {
-    daiAddress = process.env.DAI_ADDRESS
-    ownerAddress = process.env.OWNER_ADDRESS
+    daiAddress = process.env.DAI_ADDRESS;
+    ownerAddress = process.env.OWNER_ADDRESS;
   } else {
-    throw Error("Network Error");
+    return;
+    // throw Error("Network Error");
   }
 
   const calculator = await SavingsInterestCalculator.deployed();

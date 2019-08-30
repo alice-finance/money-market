@@ -10,17 +10,17 @@ module.exports = {
       gasPrice: 0x01,
       network_id: "*"
     },
-    development: {
-      host: "127.0.0.1",
-      port: 8545,
-      network_id: "*"
-    },
+    // development: {
+    //   host: "127.0.0.1",
+    //   port: 8545,
+    //   network_id: "*"
+    // },
     extdev: {
       provider: () => {
         const provider = new LoomTruffleProvider(
-          'extdev-plasma-us1',
-          'http://extdev-plasma-us1.dappchains.com:80/rpc',
-          'http://extdev-plasma-us1.dappchains.com:80/query',
+          "extdev-plasma-us1",
+          "http://extdev-plasma-us1.dappchains.com:80/rpc",
+          "http://extdev-plasma-us1.dappchains.com:80/query",
           process.env.ADMIN_PRIVATE_KEY
         );
         const engine = provider.getProviderEngine();
@@ -32,9 +32,9 @@ module.exports = {
     plasma: {
       provider: () => {
         const provider = new LoomTruffleProvider(
-          'default',
-          'http://plasma.dappchains.com:80/rpc',
-          'http://plasma.dappchains.com:80/query',
+          "default",
+          "http://plasma.dappchains.com:80/rpc",
+          "http://plasma.dappchains.com:80/query",
           process.env.ADMIN_PRIVATE_KEY
         );
         const engine = provider.getProviderEngine();
