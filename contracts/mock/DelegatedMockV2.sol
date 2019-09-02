@@ -32,7 +32,7 @@ contract DelegatedMockV2 is DelegatedMockV1 {
         _calleeStateVar2 = newValue;
     }
 
-    function revertV2() public delegated checkVersion(2) {
+    function revertV2() public view delegated checkVersion(2) {
         revert("revert V2");
     }
 }

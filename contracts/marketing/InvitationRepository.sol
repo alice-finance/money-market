@@ -4,16 +4,16 @@ pragma experimental ABIEncoderV2;
 import "./IMoneyMarket.sol";
 import "./IInvitationRepository.sol";
 
-// TODO: add ability to set length of invitation code
-// TODO: change type of code from bytes3 to bytes
-// TODO: Change word "invite" to "redeem" on methods
-// TODO: change "address" from function arguments into "code"
 contract InvitationRepository is IInvitationRepository {
     IMoneyMarket private _market;
-    uint256 private _amountPerInvitee;
+    uint256 private _amountPerInvite;
+    address private _owner;
 
-    // inviter => code
-    mapping(address => bytes3) private _codes;
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
+
     // code => inviter
     mapping(bytes3 => address) private _reverseCodes;
     // invitee = registered
@@ -22,21 +22,45 @@ contract InvitationRepository is IInvitationRepository {
     mapping(address => address) private _inviter;
     // inviter => invitees
     mapping(address => address[]) private _invitees;
+    // inviter => nonce => used
+    mapping(address => mapping(uint96 => bool)) private _nonceUsage;
 
     address[] private _inviterList;
     uint256 private _totalRegistered;
 
-    constructor(address marketAddress, uint256 amountPerInvitee) public {
+    constructor(address marketAddress, uint256 amountPerInvite) public {
+        _owner = msg.sender;
         _market = IMoneyMarket(marketAddress);
-        _amountPerInvitee = amountPerInvitee;
+        _amountPerInvite = amountPerInvite;
     }
 
-    //    function codeOf(address account) public view returns (bytes3) {
-    //        return _codes[account];
-    //    }
+    function owner() public view returns (address) {
+        return _owner;
+    }
 
-    function userOf(bytes3 code) public view returns (address) {
-        return _reverseCodes[code];
+    modifier onlyOwner() {
+        require(isOwner(), "InvitationRepository: not called from owner");
+        _;
+    }
+
+    function isOwner() public view returns (bool) {
+        return msg.sender == _owner;
+    }
+
+    function transferOwnership(address newOwner) public onlyOwner {
+        emit OwnershipTransferred(_owner, newOwner);
+        _owner = newOwner;
+    }
+
+    function amountPerInvite() public view returns (uint256) {
+        return _amountPerInvite;
+    }
+
+    function setAmountPerInvite(uint256 amount) public onlyOwner {
+        require(amount > 0, "InvitationRepository: amount is ZERO");
+
+        emit AmountPerInviteChanged(_amountPerInvite, amount);
+        _amountPerInvite = amount;
     }
 
     function isRegistered(address account) public view returns (bool) {
@@ -66,7 +90,7 @@ contract InvitationRepository is IInvitationRepository {
                 totalSavings += records[i].balance;
             }
 
-            return totalSavings / _amountPerInvitee;
+            return totalSavings / _amountPerInvite;
         }
 
         return 0;
@@ -76,37 +100,60 @@ contract InvitationRepository is IInvitationRepository {
         return _totalRegistered;
     }
 
-    function totalInviterCount() public view returns (uint256) {
-        return _inviterList.length;
-    }
-
-    // TODO:
     function redeem(bytes32 promoCode, bytes memory signature)
         public
         returns (bool)
     {
+        (address currentInviter, uint96 nonce) = _extractCode(promoCode);
+
         require(
             _registered[msg.sender] != true,
-            "InviteCode: already registered"
+            "InvitationRepository: already registered user"
         );
 
-        //        address currentInviter = bytes20(promoCode);
-        //        uint96 index = bytes12(promoCode << 20);
-        //        (uint8 v, bytes32 r, bytes32 s) = _extractSignature(signature);
-        //        require(ecrecover(promoCode, v, r, s) == currentInviter);
-        //
-        //        require(
-        //            index < maxInviteeCount(currentInviter),
-        //            "InviteCode: this code cannot be used"
-        //        );
-        //
-        //        _inviter[msg.sender] = currentInviter;
-        //        _invitees[currentInviter].push(msg.sender);
-        //        _registered[msg.sender] = true;
-        //
-        //        _totalRegistered = _totalRegistered + 1;
+        require(
+            _verifySignature(promoCode, signature),
+            "InvitationRepository: wrong code"
+        );
+
+        require(
+            nonce <= maxInviteeCount(currentInviter),
+            "InvitationRepository: max count reached"
+        );
+
+        require(
+            _nonceUsage[currentInviter][nonce] == false,
+            "InvitationRepository: code already used"
+        );
+
+        _inviter[msg.sender] = currentInviter;
+        _invitees[currentInviter].push(msg.sender);
+        _nonceUsage[currentInviter][nonce] = true;
+        _registered[msg.sender] = true;
+
+        _totalRegistered = _totalRegistered + 1;
+
+        emit InvitationCodeUsed(
+            currentInviter,
+            promoCode,
+            msg.sender,
+            block.timestamp
+        );
 
         return true;
+    }
+
+    function _extractCode(bytes32 promoCode)
+        internal
+        pure
+        returns (address, uint96)
+    {
+        address currentInviter = address(bytes20(promoCode));
+        uint96 nonce = uint96(
+            bytes12(bytes32(uint256(promoCode) * uint256(2 ** (160))))
+        );
+
+        return (currentInviter, nonce);
     }
 
     function _extractSignature(bytes memory signature)
@@ -131,12 +178,18 @@ contract InvitationRepository is IInvitationRepository {
         return (v, r, s);
     }
 
-    function _generateCode(address account, uint256 pos)
-        private
+    function _verifySignature(bytes32 promoCode, bytes memory signature)
+        internal
         pure
-        returns (bytes3)
+        returns (bool)
     {
-        return bytes3(bytes20(uint160(account) * uint160(2**(4 * pos))));
-        // return bytes3(bytes20(account) << (4 * pos));
+        (address currentInviter, ) = _extractCode(promoCode);
+        bytes32 hash = keccak256(abi.encode(promoCode));
+        bytes32 hash2 = keccak256(
+            abi.encodePacked("\x19Ethereum Signed Message:\n32", hash)
+        );
+        (uint8 v, bytes32 r, bytes32 s) = _extractSignature(signature);
+
+        return ecrecover(hash2, v, r, s) == currentInviter;
     }
 }

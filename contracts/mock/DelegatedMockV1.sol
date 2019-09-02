@@ -26,7 +26,7 @@ contract DelegatedMockV1 is DelegatedBase {
         _calleeStateVar1 = newValue;
     }
 
-    function revertV1() public initialized delegated {
+    function revertV1() public view initialized delegated {
         revert("revert V1");
     }
 }

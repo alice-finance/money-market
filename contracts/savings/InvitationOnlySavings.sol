@@ -39,8 +39,8 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
     function invitationOnlySavingsCalculator()
         public
         view
-        initialized
         delegated
+        checkVersion(1)
         returns (IInterestCalculator)
     {
         return _invitationOnlySavingsInterestCalculator;
@@ -48,8 +48,8 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
 
     function setInvitationOnlySavingsCalculator(IInterestCalculator calculator)
         public
-        initialized
         delegated
+        checkVersion(1)
         onlyOwner
     {
         require(
@@ -67,8 +67,8 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
     function invitationRepository()
         public
         view
-        initialized
         delegated
+        checkVersion(1)
         returns (IInvitationRepository)
     {
         return _invitationRepository;
@@ -76,8 +76,8 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
 
     function setInvitationRepository(IInvitationRepository repository)
         public
-        initialized
         delegated
+        checkVersion(1)
         onlyOwner
     {
         require(
@@ -95,8 +95,8 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
     function minimumSavingsAmount()
         public
         view
-        initialized
         delegated
+        checkVersion(1)
         returns (uint256)
     {
         return _minimumSavingsAmount;
@@ -104,8 +104,8 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
 
     function setMinimumSavingsAmount(uint256 amount)
         public
-        initialized
         delegated
+        checkVersion(1)
         onlyOwner
     {
         emit MinimumSavingsAmountChanged(_minimumSavingsAmount, amount);
@@ -114,8 +114,8 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
 
     function invitationOnlyDeposit(uint256 amount)
         public
-        initialized
         delegated
+        checkVersion(1)
         returns (uint256)
     {
         return _invitationOnlyDeposit(msg.sender, amount);
@@ -137,8 +137,8 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
     function getCurrentInvitationOnlySavingsInterestRate()
         public
         view
-        initialized
         delegated
+        checkVersion(1)
         returns (uint256)
     {
         return _calculateInvitationOnlySavingsInterestRate(MULTIPLIER);
@@ -147,8 +147,8 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
     function getCurrentInvitationOnlySavingsAPR()
         public
         view
-        initialized
         delegated
+        checkVersion(1)
         returns (uint256)
     {
         return
@@ -163,8 +163,8 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
     function getExpectedInvitationOnlySavingsInterestRate(uint256 amount)
         public
         view
-        initialized
         delegated
+        checkVersion(1)
         returns (uint256)
     {
         return _calculateInvitationOnlySavingsInterestRate(amount);
@@ -173,8 +173,8 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
     function getExpectedInvitationOnlySavingsAPR(uint256 amount)
         public
         view
-        initialized
         delegated
+        checkVersion(1)
         returns (uint256)
     {
         return
