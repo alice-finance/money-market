@@ -3,13 +3,14 @@ pragma experimental ABIEncoderV2;
 
 import "./Savings.sol";
 import "../marketing/IInvitationRepository.sol";
+import "../base/DelegatedBase.sol";
 
-contract InvitationOnlySavings is Savings {
-    IInterestCalculator internal _savingsInterestCalculator2;
+contract InvitationOnlySavings is DelegatedBase, Savings {
+    IInterestCalculator internal _invitationOnlySavingsInterestCalculator;
     IInvitationRepository internal _invitationRepository;
     uint256 internal _minimumSavingsAmount;
 
-    event SavingsCalculator2Changed(
+    event InvitationOnlySavingsCalculatorChanged(
         address indexed previousCalculator,
         address indexed newCalculator
     );
@@ -21,98 +22,176 @@ contract InvitationOnlySavings is Savings {
 
     event MinimumSavingsAmountChanged(uint256 from, uint256 to);
 
-    function savingsCalculator2() public view returns (IInterestCalculator) {
-        return _savingsInterestCalculator2;
+    function initialize(
+        IInterestCalculator zeroCalculator,
+        IInterestCalculator invitationOnlySavingsCalculator,
+        IInvitationRepository invitationRepository,
+        uint256 minimumSavingsAmount
+    ) public {
+        require(_initialize(1));
+
+        setSavingsCalculator(zeroCalculator);
+        setInvitationOnlySavingsCalculator(invitationOnlySavingsCalculator);
+        setInvitationRepository(invitationRepository);
+        setMinimumSavingsAmount(minimumSavingsAmount);
     }
 
-    function setSavingsCalculator2(IInterestCalculator calculator)
+    function invitationOnlySavingsCalculator()
         public
+        view
+        initialized
+        delegated
+        returns (IInterestCalculator)
+    {
+        return _invitationOnlySavingsInterestCalculator;
+    }
+
+    function setInvitationOnlySavingsCalculator(IInterestCalculator calculator)
+        public
+        initialized
+        delegated
         onlyOwner
     {
-        require(address(calculator) != address(0), "ZERO address");
+        require(
+            address(calculator) != address(0),
+            "new calculator is zero address"
+        );
 
-        emit SavingsCalculatorChanged(
-            address(_savingsInterestCalculator2),
+        emit InvitationOnlySavingsCalculatorChanged(
+            address(_invitationOnlySavingsInterestCalculator),
             address(calculator)
         );
-        _savingsInterestCalculator2 = calculator;
+        _invitationOnlySavingsInterestCalculator = calculator;
     }
 
-    function setMinimumSavingsAmount(uint256 amount) public onlyOwner {
+    function invitationRepository()
+        public
+        view
+        initialized
+        delegated
+        returns (IInvitationRepository)
+    {
+        return _invitationRepository;
+    }
+
+    function setInvitationRepository(IInvitationRepository repository)
+        public
+        initialized
+        delegated
+        onlyOwner
+    {
+        require(
+            address(repository) != address(0),
+            "new invitation repository is zero address"
+        );
+
+        emit InvitationRepositoryChanged(
+            address(_invitationRepository),
+            address(repository)
+        );
+        _invitationRepository = repository;
+    }
+
+    function minimumSavingsAmount()
+        public
+        view
+        initialized
+        delegated
+        returns (uint256)
+    {
+        return _minimumSavingsAmount;
+    }
+
+    function setMinimumSavingsAmount(uint256 amount)
+        public
+        initialized
+        delegated
+        onlyOwner
+    {
         emit MinimumSavingsAmountChanged(_minimumSavingsAmount, amount);
         _minimumSavingsAmount = amount;
     }
 
-    function setInvitationRepository(IInvitationRepository invitationCode)
+    function invitationOnlyDeposit(uint256 amount)
         public
-        onlyOwner
+        initialized
+        delegated
+        returns (uint256)
     {
-        emit InvitationRepositoryChanged(
-            address(_invitationRepository),
-            address(invitationCode)
-        );
-        _invitationRepository = invitationCode;
+        return _invitationOnlyDeposit(msg.sender, amount);
     }
 
-    function deposit2(uint256 amount) public returns (uint256) {
-        return _deposit2(msg.sender, amount);
-    }
-
-    function _calculateSavingsInterestRate2(uint256 amount)
+    function _calculateInvitationOnlySavingsInterestRate(uint256 amount)
         internal
         view
         returns (uint256)
     {
         return
-            _savingsInterestCalculator2.getInterestRate(
+            _invitationOnlySavingsInterestCalculator.getInterestRate(
                 _totalFunds,
                 _totalBorrows,
                 amount
             );
     }
 
-    function getCurrentSavingsInterestRate2() public view returns (uint256) {
-        return _calculateSavingsInterestRate2(MULTIPLIER);
+    function getCurrentInvitationOnlySavingsInterestRate()
+        public
+        view
+        initialized
+        delegated
+        returns (uint256)
+    {
+        return _calculateInvitationOnlySavingsInterestRate(MULTIPLIER);
     }
 
-    function getCurrentSavingsAPR2() public view returns (uint256) {
+    function getCurrentInvitationOnlySavingsAPR()
+        public
+        view
+        initialized
+        delegated
+        returns (uint256)
+    {
         return
             _savingsInterestCalculator.getExpectedBalance(
                     MULTIPLIER,
-                    _calculateSavingsInterestRate2(MULTIPLIER),
+                    _calculateInvitationOnlySavingsInterestRate(MULTIPLIER),
                     365 days
                 ) -
                 MULTIPLIER;
     }
 
-    function getExpectedSavingsInterestRate2(uint256 amount)
+    function getExpectedInvitationOnlySavingsInterestRate(uint256 amount)
         public
         view
+        initialized
+        delegated
         returns (uint256)
     {
-        return _calculateSavingsInterestRate2(amount);
+        return _calculateInvitationOnlySavingsInterestRate(amount);
     }
 
-    function getExpectedSavingsAPR2(uint256 amount)
+    function getExpectedInvitationOnlySavingsAPR(uint256 amount)
         public
         view
+        initialized
+        delegated
         returns (uint256)
     {
         return
-            _savingsInterestCalculator2.getExpectedBalance(
+            _invitationOnlySavingsInterestCalculator.getExpectedBalance(
                     MULTIPLIER,
-                    _calculateSavingsInterestRate2(amount),
+                    _calculateInvitationOnlySavingsInterestRate(amount),
                     365 days
                 ) -
                 MULTIPLIER;
     }
 
-    function _deposit2(address user, uint256 amount)
+    function _invitationOnlyDeposit(address user, uint256 amount)
         internal
         nonReentrant
         returns (uint256)
     {
-        require(amount > _minimumSavingsAmount, "invalid amount");
+        require(amount >= _minimumSavingsAmount, "invalid amount");
         require(
             _invitationRepository.isRegistered(user),
             "user does not registered invitation code"
@@ -123,9 +202,8 @@ contract InvitationOnlySavings is Savings {
 
         _savingsRecords[recordId].id = recordId;
         _savingsRecords[recordId].owner = user;
-        _savingsRecords[recordId].interestRate = _calculateSavingsInterestRate2(
-            amount
-        );
+        _savingsRecords[recordId]
+            .interestRate = _calculateInvitationOnlySavingsInterestRate(amount);
         _savingsRecords[recordId].balance = amount;
         _savingsRecords[recordId].principal = amount;
         _savingsRecords[recordId].initialTimestamp = block.timestamp;
