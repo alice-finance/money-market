@@ -1,5 +1,5 @@
 const fs = require("fs");
-const {execSync} = require("child_process");
+const { execSync } = require("child_process");
 
 const ABI_PATH = "abis";
 const NETWORKS_PATH = "networks";
@@ -15,7 +15,7 @@ if (!fs.existsSync(NETWORKS_PATH)) {
 fs.readdirSync(NETWORKS_PATH).forEach(file => fs.unlinkSync(NETWORKS_PATH + "/" + file));
 
 fs.readdirSync("build/contracts").forEach(file => {
-  const {abi, networks} = JSON.parse(fs.readFileSync("build/contracts/" + file, "utf-8"));
+  const { abi, networks } = JSON.parse(fs.readFileSync("build/contracts/" + file, "utf-8"));
   for (id of Object.keys(networks)) {
     if (["5777"].includes(id)) {
       delete networks[id];
