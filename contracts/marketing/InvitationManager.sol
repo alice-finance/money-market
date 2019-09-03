@@ -2,11 +2,11 @@ pragma solidity 0.5.8;
 pragma experimental ABIEncoderV2;
 
 import "./IMoneyMarket.sol";
-import "./IInvitationRepository.sol";
+import "./IInvitationManager.sol";
 
-contract InvitationRepository is IInvitationRepository {
+contract InvitationManager is IInvitationManager {
     IMoneyMarket private _market;
-    uint256 private _amountPerInvite;
+    uint256 private _amountOfSavingsPerInvite;
     address private _owner;
 
     event OwnershipTransferred(
@@ -14,24 +14,18 @@ contract InvitationRepository is IInvitationRepository {
         address indexed newOwner
     );
 
-    // code => inviter
-    mapping(bytes3 => address) private _reverseCodes;
-    // invitee = registered
-    mapping(address => bool) private _registered;
-    // invitee => inviter
     mapping(address => address) private _inviter;
-    // inviter => invitees
-    mapping(address => address[]) private _invitees;
-    // inviter => nonce => used
+    mapping(address => bool) private _redeemed;
+    mapping(address => address[]) private _redemptions;
     mapping(address => mapping(uint96 => bool)) private _nonceUsage;
 
     address[] private _inviterList;
-    uint256 private _totalRegistered;
+    uint256 private _totalRedeemed;
 
-    constructor(address marketAddress, uint256 amountPerInvite) public {
+    constructor(address marketAddress, uint256 amountOfSavingsPerInvite) public {
         _owner = msg.sender;
         _market = IMoneyMarket(marketAddress);
-        _amountPerInvite = amountPerInvite;
+        _amountOfSavingsPerInvite = amountOfSavingsPerInvite;
     }
 
     function owner() public view returns (address) {
@@ -39,7 +33,7 @@ contract InvitationRepository is IInvitationRepository {
     }
 
     modifier onlyOwner() {
-        require(isOwner(), "InvitationRepository: not called from owner");
+        require(isOwner(), "InvitationManager: not called from owner");
         _;
     }
 
@@ -52,34 +46,22 @@ contract InvitationRepository is IInvitationRepository {
         _owner = newOwner;
     }
 
-    function amountPerInvite() public view returns (uint256) {
-        return _amountPerInvite;
+    function amountOfSavingsPerInvite() public view returns (uint256) {
+        return _amountOfSavingsPerInvite;
     }
 
-    function setAmountPerInvite(uint256 amount) public onlyOwner {
-        require(amount > 0, "InvitationRepository: amount is ZERO");
+    function setAmountOfSavingsPerInvite(uint256 amount) public onlyOwner {
+        require(amount > 0, "InvitationManager: amount is ZERO");
 
-        emit AmountPerInviteChanged(_amountPerInvite, amount);
-        _amountPerInvite = amount;
-    }
-
-    function isRegistered(address account) public view returns (bool) {
-        return _registered[account];
+        emit AmountOfSavingsPerInviteChanged(_amountOfSavingsPerInvite, amount);
+        _amountOfSavingsPerInvite = amount;
     }
 
     function inviter(address account) public view returns (address) {
         return _inviter[account];
     }
 
-    function invitees(address account) public view returns (address[] memory) {
-        return _invitees[account];
-    }
-
-    function inviteeCount(address account) public view returns (uint256) {
-        return _invitees[account].length;
-    }
-
-    function maxInviteeCount(address account) public view returns (uint256) {
+    function invitationSlots(address account) public view returns (uint256) {
         IMoneyMarket.SavingsRecord[] memory records = _market.getSavingsRecords(
             account
         );
@@ -90,14 +72,26 @@ contract InvitationRepository is IInvitationRepository {
                 totalSavings += records[i].balance;
             }
 
-            return totalSavings / _amountPerInvite;
+            return totalSavings / _amountOfSavingsPerInvite;
         }
 
         return 0;
     }
 
-    function totalRegistered() public view returns (uint256) {
-        return _totalRegistered;
+    function isRedeemed(address account) public view returns (bool) {
+        return _redeemed[account];
+    }
+
+    function redemptions(address account) public view returns (address[] memory) {
+        return _redemptions[account];
+    }
+
+    function redemptionCount(address account) public view returns (uint256) {
+        return _redemptions[account].length;
+    }
+
+    function totalRedeemed() public view returns (uint256) {
+        return _totalRedeemed;
     }
 
     function redeem(bytes32 promoCode, bytes memory signature)
@@ -107,31 +101,31 @@ contract InvitationRepository is IInvitationRepository {
         (address currentInviter, uint96 nonce) = _extractCode(promoCode);
 
         require(
-            _registered[msg.sender] != true,
-            "InvitationRepository: already registered user"
+            _redeemed[msg.sender] != true,
+            "InvitationManager: already redeemed user"
         );
 
         require(
             _verifySignature(promoCode, signature),
-            "InvitationRepository: wrong code"
+            "InvitationManager: wrong code"
         );
 
         require(
-            nonce <= maxInviteeCount(currentInviter),
-            "InvitationRepository: max count reached"
+            nonce <= invitationSlots(currentInviter),
+            "InvitationManager: max count reached"
         );
 
         require(
             _nonceUsage[currentInviter][nonce] == false,
-            "InvitationRepository: code already used"
+            "InvitationManager: code already used"
         );
 
         _inviter[msg.sender] = currentInviter;
-        _invitees[currentInviter].push(msg.sender);
+        _redemptions[currentInviter].push(msg.sender);
         _nonceUsage[currentInviter][nonce] = true;
-        _registered[msg.sender] = true;
+        _redeemed[msg.sender] = true;
 
-        _totalRegistered = _totalRegistered + 1;
+        _totalRedeemed = _totalRedeemed + 1;
 
         emit InvitationCodeUsed(
             currentInviter,

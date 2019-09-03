@@ -2,12 +2,12 @@ pragma solidity 0.5.8;
 pragma experimental ABIEncoderV2;
 
 import "./Savings.sol";
-import "../marketing/IInvitationRepository.sol";
+import "../marketing/IInvitationManager.sol";
 import "../base/DelegatedBase.sol";
 
 contract InvitationOnlySavings is DelegatedBase, Savings {
     IInterestCalculator internal _invitationOnlySavingsInterestCalculator;
-    IInvitationRepository internal _invitationRepository;
+    IInvitationManager internal _invitationManager;
     uint256 internal _minimumSavingsAmount;
 
     event InvitationOnlySavingsCalculatorChanged(
@@ -15,9 +15,9 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
         address indexed newCalculator
     );
 
-    event InvitationRepositoryChanged(
-        address indexed previousRepository,
-        address indexed newRepository
+    event InvitationManagerChanged(
+        address indexed previousManager,
+        address indexed newManager
     );
 
     event MinimumSavingsAmountChanged(uint256 from, uint256 to);
@@ -25,14 +25,14 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
     function initialize(
         IInterestCalculator zeroCalculator,
         IInterestCalculator invitationOnlySavingsCalculator,
-        IInvitationRepository invitationRepository,
+        IInvitationManager invitationManager,
         uint256 minimumSavingsAmount
     ) public {
         require(_initialize(1));
 
         setSavingsCalculator(zeroCalculator);
         setInvitationOnlySavingsCalculator(invitationOnlySavingsCalculator);
-        setInvitationRepository(invitationRepository);
+        setInvitationManager(invitationManager);
         setMinimumSavingsAmount(minimumSavingsAmount);
     }
 
@@ -64,17 +64,17 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
         _invitationOnlySavingsInterestCalculator = calculator;
     }
 
-    function invitationRepository()
+    function invitationManager()
         public
         view
         delegated
         checkVersion(1)
-        returns (IInvitationRepository)
+        returns (IInvitationManager)
     {
-        return _invitationRepository;
+        return _invitationManager;
     }
 
-    function setInvitationRepository(IInvitationRepository repository)
+    function setInvitationManager(IInvitationManager repository)
         public
         delegated
         checkVersion(1)
@@ -85,11 +85,11 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
             "new invitation repository is zero address"
         );
 
-        emit InvitationRepositoryChanged(
-            address(_invitationRepository),
+        emit InvitationManagerChanged(
+            address(_invitationManager),
             address(repository)
         );
-        _invitationRepository = repository;
+        _invitationManager = repository;
     }
 
     function minimumSavingsAmount()
@@ -193,7 +193,7 @@ contract InvitationOnlySavings is DelegatedBase, Savings {
     {
         require(amount >= _minimumSavingsAmount, "invalid amount");
         require(
-            _invitationRepository.isRegistered(user),
+            _invitationManager.isRedeemed(user),
             "user does not registered invitation code"
         );
 
