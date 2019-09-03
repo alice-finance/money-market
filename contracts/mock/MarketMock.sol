@@ -30,9 +30,9 @@ contract MarketMock is IMoneyMarket {
     }
 
     function getSavingsRecord(uint256 recordId)
-    public
-    view
-    returns (SavingsRecord memory)
+        public
+        view
+        returns (SavingsRecord memory)
     {
         SavingsRecord memory record = _record[recordId];
 
@@ -42,9 +42,9 @@ contract MarketMock is IMoneyMarket {
     }
 
     function getSavingsRecords(address user)
-    public
-    view
-    returns (SavingsRecord[] memory)
+        public
+        view
+        returns (SavingsRecord[] memory)
     {
         uint256[] storage ids = _recordIds[user];
         SavingsRecord[] memory records = new SavingsRecord[](ids.length);
@@ -57,9 +57,9 @@ contract MarketMock is IMoneyMarket {
     }
 
     function getSavingsRecordIds(address user)
-    public
-    view
-    returns (uint256[] memory)
+        public
+        view
+        returns (uint256[] memory)
     {
         return _recordIds[user];
     }

@@ -14,19 +14,27 @@ contract InvitationManagerMock is IInvitationManager {
         _redeemed[account] = redeemed;
     }
 
-    function inviter(address /* account */) public view returns (address) {
+    function inviter(
+        address /* account */
+    ) public view returns (address) {
         revert("not implemented");
     }
 
-    function invitationSlots(address /* account */) public view returns (uint256) {
+    function invitationSlots(
+        address /* account */
+    ) public view returns (uint256) {
         revert("not implemented");
     }
 
-    function redemptions(address /* account */) public view returns (address[] memory) {
+    function redemptions(
+        address /* account */
+    ) public view returns (address[] memory) {
         revert("not implemented");
     }
 
-    function redemptionCount(address /* account */) public view returns (uint256) {
+    function redemptionCount(
+        address /* account */
+    ) public view returns (uint256) {
         revert("not implemented");
     }
 
@@ -34,10 +42,10 @@ contract InvitationManagerMock is IInvitationManager {
         revert("not implemented");
     }
 
-    function redeem(bytes32 /* promoCode */, bytes memory /* signature */)
-        public
-        returns (bool)
-    {
+    function redeem(
+        bytes32, /* promoCode */
+        bytes memory /* signature */
+    ) public returns (bool) {
         revert("not implemented");
     }
 }

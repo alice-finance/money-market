@@ -2,7 +2,7 @@ const { constants, BN, expectEvent, expectRevert, time } = require("openzeppelin
 const { expect } = require("chai");
 
 const MoneyMarket = artifacts.require("MoneyMarket.sol");
-const InvitationRepository = artifacts.require("mock/InvitationRepositoryMock.sol");
+const InvitationManager = artifacts.require("mock/InvitationManagerMock.sol");
 const SavingsV2 = artifacts.require("savings/InvitationOnlySavings.sol");
 const ERC20 = artifacts.require("mock/ERC20Mock.sol");
 const ERC20Invalid = artifacts.require("mock/ERC20MockInvalid.sol");
@@ -40,7 +40,7 @@ contract("InvitationOnlySavings", function([
     this.dai = await ERC20.new("DAI Stable Token", "DAI", 18);
     this.calculator = await Calculator.new();
     this.zeroCalculator = await ZeroCalculator.new();
-    this.invitationRepository = await InvitationRepository.new();
+    this.invitationManager = await InvitationManager.new();
 
     this.users = [user1, user2, user3, not_allowed_user, not_registered_user];
 
@@ -48,11 +48,11 @@ contract("InvitationOnlySavings", function([
       await this.dai.mint(u, MAX_AMOUNT, { from: admin });
     }
 
-    await this.invitationRepository.setRegistered(user1, true);
-    await this.invitationRepository.setRegistered(user2, true);
-    await this.invitationRepository.setRegistered(user3, true);
-    await this.invitationRepository.setRegistered(not_allowed_user, true);
-    await this.invitationRepository.setRegistered(insufficient_user, true);
+    await this.invitationManager.setRedeemed(user1, true);
+    await this.invitationManager.setRedeemed(user2, true);
+    await this.invitationManager.setRedeemed(user3, true);
+    await this.invitationManager.setRedeemed(not_allowed_user, true);
+    await this.invitationManager.setRedeemed(insufficient_user, true);
   });
 
   beforeEach(async function() {
@@ -63,7 +63,7 @@ contract("InvitationOnlySavings", function([
     await this.market.initialize(
       this.zeroCalculator.address,
       this.calculator.address,
-      this.invitationRepository.address,
+      this.invitationManager.address,
       MINIMUM_SAVINGS_AMOUNT
     );
 
@@ -81,7 +81,7 @@ contract("InvitationOnlySavings", function([
 
     expect(await this.market.savingsCalculator()).to.be.equal(this.zeroCalculator.address);
     expect(await this.market.invitationOnlySavingsCalculator()).to.be.equal(this.calculator.address);
-    expect(await this.market.invitationRepository()).to.be.equal(this.invitationRepository.address);
+    expect(await this.market.invitationManager()).to.be.equal(this.invitationManager.address);
     expect(await this.market.minimumSavingsAmount()).to.be.bignumber.equal(MINIMUM_SAVINGS_AMOUNT);
   });
 
@@ -125,7 +125,7 @@ contract("InvitationOnlySavings", function([
         this.market.initialize(
           this.zeroCalculator.address,
           this.calculator.address,
-          this.invitationRepository.address,
+          this.invitationManager.address,
           MINIMUM_SAVINGS_AMOUNT
         ),
         "version already initialized"
@@ -163,33 +163,33 @@ contract("InvitationOnlySavings", function([
       );
     });
 
-    it("should set and get InvitationRepository", async function() {
-      const newRepository = await InvitationRepository.new();
+    it("should set and get InvitationManager", async function() {
+      const newManager = await InvitationManager.new();
 
-      let { logs } = await this.market.setInvitationRepository(newRepository.address, {
+      let { logs } = await this.market.setInvitationManager(newManager.address, {
         from: admin
       });
 
-      expectEvent.inLogs(logs, "InvitationRepositoryChanged", {
-        previousRepository: this.invitationRepository.address,
-        newRepository: newRepository.address
+      expectEvent.inLogs(logs, "InvitationManagerChanged", {
+        previousManager: this.invitationManager.address,
+        newManager: newManager.address
       });
 
-      expect(await this.market.invitationRepository()).to.be.equal(newRepository.address);
+      expect(await this.market.invitationManager()).to.be.equal(newManager.address);
     });
 
-    it("should not set InvitationRepository when address is ZERO_ADDRESS", async function() {
+    it("should not set InvitationManager when address is ZERO_ADDRESS", async function() {
       await expectRevert(
-        this.market.setInvitationRepository(ZERO_ADDRESS, { from: admin }),
+        this.market.setInvitationManager(ZERO_ADDRESS, { from: admin }),
         "new invitation repository is zero address"
       );
     });
 
-    it("should not set InvitationRepository when not called from owner", async function() {
-      const repository = await InvitationRepository.new();
+    it("should not set InvitationManager when not called from owner", async function() {
+      const repository = await InvitationManager.new();
 
       await expectRevert(
-        this.market.setInvitationRepository(repository.address, { from: notAdmin }),
+        this.market.setInvitationManager(repository.address, { from: notAdmin }),
         "not called from owner"
       );
     });
@@ -321,7 +321,7 @@ contract("InvitationOnlySavings", function([
         market.initialize(
           this.zeroCalculator.address,
           this.calculator.address,
-          this.invitationRepository.address,
+          this.invitationManager.address,
           MINIMUM_SAVINGS_AMOUNT
         );
 
@@ -343,7 +343,7 @@ contract("InvitationOnlySavings", function([
         market.initialize(
           this.zeroCalculator.address,
           this.calculator.address,
-          this.invitationRepository.address,
+          this.invitationManager.address,
           MINIMUM_SAVINGS_AMOUNT
         );
 
@@ -507,7 +507,7 @@ contract("InvitationOnlySavings", function([
         market.initialize(
           this.zeroCalculator.address,
           this.calculator.address,
-          this.invitationRepository.address,
+          this.invitationManager.address,
           MINIMUM_SAVINGS_AMOUNT
         );
 

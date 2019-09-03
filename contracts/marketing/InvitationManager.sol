@@ -22,7 +22,9 @@ contract InvitationManager is IInvitationManager {
     address[] private _inviterList;
     uint256 private _totalRedeemed;
 
-    constructor(address marketAddress, uint256 amountOfSavingsPerInvite) public {
+    constructor(address marketAddress, uint256 amountOfSavingsPerInvite)
+        public
+    {
         _owner = msg.sender;
         _market = IMoneyMarket(marketAddress);
         _amountOfSavingsPerInvite = amountOfSavingsPerInvite;
@@ -82,7 +84,11 @@ contract InvitationManager is IInvitationManager {
         return _redeemed[account];
     }
 
-    function redemptions(address account) public view returns (address[] memory) {
+    function redemptions(address account)
+        public
+        view
+        returns (address[] memory)
+    {
         return _redemptions[account];
     }
 
@@ -144,7 +150,7 @@ contract InvitationManager is IInvitationManager {
     {
         address currentInviter = address(bytes20(promoCode));
         uint96 nonce = uint96(
-            bytes12(bytes32(uint256(promoCode) * uint256(2 ** (160))))
+            bytes12(bytes32(uint256(promoCode) * uint256(2**(160))))
         );
 
         return (currentInviter, nonce);
