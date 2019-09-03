@@ -1,7 +1,6 @@
 require("dotenv").config();
 const MoneyMarket = artifacts.require("MoneyMarket.sol");
-const SavingsV2 = artifacts.require("savings/InvitationOnlySavings.sol");
-const InvitationCode = artifacts.require("marketing/IInvitationRepository.sol");
+const InvitationManager = artifacts.require("marketing/InvitationManager.sol");
 
 module.exports = async function(deployer, network, [admin]) {
   if (!["extdev", "plasma"].includes(network)) {
@@ -9,5 +8,5 @@ module.exports = async function(deployer, network, [admin]) {
   }
 
   const market = await MoneyMarket.deployed();
-  await deployer.deploy(InvitationCode, market.address, "25000000000000000000");
+  await deployer.deploy(InvitationManager, market.address, "25000000000000000000");
 };
