@@ -6,15 +6,15 @@ import "../marketing/IInvitationManager.sol";
 import "../marketing/InvitationManagerBase.sol";
 
 contract InvitationOnlySavingsBase is DelegatedSavingsBase, IInvitationManager {
-    uint256 private _amountOfSavingsPerInvite;
+    uint256 internal _amountOfSavingsPerInvite;
 
-    mapping(address => address) private _inviter;
-    mapping(address => bool) private _redeemed;
-    mapping(address => address[]) private _redemptions;
-    mapping(address => mapping(uint96 => bool)) private _nonceUsage;
+    mapping(address => address) internal _inviter;
+    mapping(address => bool) internal _redeemed;
+    mapping(address => address[]) internal _redemptions;
+    mapping(address => mapping(uint96 => bool)) internal _nonceUsage;
 
-    address[] private _inviterList;
-    uint256 private _totalRedeemed;
+    address[] internal _inviterList;
+    uint256 internal _totalRedeemed;
 
     function amountOfSavingsPerInvite() public view returns (uint256) {
         return _amountOfSavingsPerInvite;
@@ -119,7 +119,7 @@ contract InvitationOnlySavingsBase is DelegatedSavingsBase, IInvitationManager {
     {
         address currentInviter = address(bytes20(promoCode));
         uint96 nonce = uint96(
-            bytes12(bytes32(uint256(promoCode) * uint256(2 ** (160))))
+            bytes12(bytes32(uint256(promoCode) * uint256(2**(160))))
         );
 
         return (currentInviter, nonce);
@@ -160,5 +160,16 @@ contract InvitationOnlySavingsBase is DelegatedSavingsBase, IInvitationManager {
         (uint8 v, bytes32 r, bytes32 s) = _extractSignature(signature);
 
         return ecrecover(hash2, v, r, s) == currentInviter;
+    }
+
+    function depositWithData(uint256 amount, bytes memory data)
+        public
+        delegated
+        checkVersion(1)
+        returns (uint256)
+    {
+        require(isRedeemed(msg.sender), "User not redeemed");
+
+        return _deposit(msg.sender, amount, data);
     }
 }

@@ -21,11 +21,35 @@ const generateSignature = async (hash, address) => {
 };
 
 contract("InvitationManager", function([admin, newAdmin, notAdmin, inviter, invitee1, invitee2, invitee3]) {
-  beforeEach(async function() {
-    this.market = await MarketMock.new();
-    this.invitationManager = await InvitationManager.new(this.market.address, AMOUNT_PER_INVITE, { from: admin });
+  before(async function() {
+    this.dai = await ERC20.new("DAI Stable Token", "DAI", 18);
+    this.calculator = await Calculator.new();
+    this.zeroCalculator = await ZeroCalculator.new();
+    this.invitationManager = await InvitationManager.new();
+
+    this.users = [user1, user2, user3, not_allowed_user, not_registered_user];
+
+    for (const [i, u] of this.users.entries()) {
+      await this.dai.mint(u, MAX_AMOUNT, { from: admin });
+    }
   });
 
+  beforeEach(async function() {
+    this.base = await MoneyMarket.new(admin, this.dai.address, this.zeroCalculator.address);
+    this.savings = await SavingsV2.new();
+    await this.base.setLoan(this.savings.address);
+    this.market = await SavingsV2.at(this.base.address);
+    await this.market.initialize(
+      this.zeroCalculator.address,
+      this.calculator.address,
+      this.invitationManager.address,
+      MINIMUM_SAVINGS_AMOUNT
+    );
+
+    for (const [i, u] of this.users.slice(0, 3).entries()) {
+      await this.dai.approve(this.market.address, MAX_UINT256, { from: u });
+    }
+  });
   it("should change amount per invite", async function() {
     const newAmount = AMOUNT_PER_INVITE.div(new BN(5));
 

@@ -146,7 +146,7 @@ contract DelegatedSavingsBase is DelegatedBase {
     }
 
     /** Internal functions */
-    function _deposit(address user, uint256 amount)
+    function _deposit(address user, uint256 amount, bytes memory data)
         internal
         nonReentrant
         returns (uint256)
@@ -265,7 +265,7 @@ contract DelegatedSavingsBase is DelegatedBase {
         checkVersion(1)
         returns (uint256)
     {
-        return _deposit(msg.sender, amount);
+        return _deposit(msg.sender, amount, data);
     }
 
     function withdrawWithData(
