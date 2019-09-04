@@ -1,6 +1,6 @@
 pragma solidity 0.5.8;
 
-import "../base/Base.sol";
+import "../../base/Base.sol";
 import "./ReentrancyAttack.sol";
 
 contract BaseMock is Base {

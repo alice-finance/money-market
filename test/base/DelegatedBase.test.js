@@ -2,10 +2,10 @@ const { expectEvent, expectRevert, BN, constants } = require("openzeppelin-test-
 const { expect } = require("chai");
 const { ZERO_ADDRESS } = constants;
 
-const Base = artifacts.require("contracts/mock/FallbackDispatcherMock.sol");
-const Delegated0 = artifacts.require("contracts/mock/DelegatedMockV0.sol");
-const Delegated1 = artifacts.require("contracts/mock/DelegatedMockV1.sol");
-const Delegated2 = artifacts.require("contracts/mock/DelegatedMockV2.sol");
+const Base = artifacts.require("mock/base/FallbackDispatcherMock.sol");
+const Delegated0 = artifacts.require("mock/base/DelegatedMockV0.sol");
+const Delegated1 = artifacts.require("mock/base/DelegatedMockV1.sol");
+const Delegated2 = artifacts.require("mock/base/DelegatedMockV2.sol");
 
 contract("DelegatedBase", function([admin, notAdmin]) {
   beforeEach(async function() {

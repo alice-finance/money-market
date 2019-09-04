@@ -1,6 +1,6 @@
 pragma solidity 0.5.8;
 
-import "../base/Base.sol";
+import "../../base/Base.sol";
 
 contract ImplV1 is Base {
     uint256 private _calleeStateVar1 = 100;

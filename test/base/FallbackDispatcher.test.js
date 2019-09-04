@@ -1,10 +1,10 @@
 const { expectRevert, BN } = require("openzeppelin-test-helpers");
 const { expect } = require("chai");
 
-let Base = artifacts.require("contracts/mock/FallbackDispatcherMock.sol");
-let ImplV1 = artifacts.require("contracts/mock/ImplV1.sol");
-let ImplV2 = artifacts.require("contracts/mock/ImplV2.sol");
-let InvalidImpl = artifacts.require("contracts/mock/InvalidImpl.sol");
+let Base = artifacts.require("mock/base/FallbackDispatcherMock.sol");
+let ImplV1 = artifacts.require("mock/base/ImplV1.sol");
+let ImplV2 = artifacts.require("mock/base/ImplV2.sol");
+let InvalidImpl = artifacts.require("mock/base/InvalidImpl.sol");
 
 contract("Base", function([owner]) {
   beforeEach(async function() {

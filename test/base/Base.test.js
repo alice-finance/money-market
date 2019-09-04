@@ -2,9 +2,9 @@ const { constants, expectEvent, expectRevert, BN } = require("openzeppelin-test-
 const { ZERO_ADDRESS } = constants;
 const { expect } = require("chai");
 
-let Base = artifacts.require("contracts/mock/BaseMock.sol");
-let ReentrancyAttack = artifacts.require("contracts/mock/ReentrancyAttack.sol");
-let InterestCalculator = artifacts.require("contracts/calculator/BaseInterestCalculator.sol");
+let Base = artifacts.require("mock/base/BaseMock.sol");
+let ReentrancyAttack = artifacts.require("mock/base/ReentrancyAttack.sol");
+let InterestCalculator = artifacts.require("calculator/BaseInterestCalculator.sol");
 
 contract("Base", function([owner1, owner2, notOwner, loan1, loan2]) {
   beforeEach(async function() {

@@ -1,7 +1,7 @@
 const { expectRevert, BN } = require("openzeppelin-test-helpers");
 const { expect } = require("chai");
 
-const BaseInterestCalculator = artifacts.require("contracts/calculator/BaseInterestCalculator.sol");
+const BaseInterestCalculator = artifacts.require("calculator/BaseInterestCalculator.sol");
 
 async function getCalculatorBalance(principal, rate, terms) {
   const convertedTerms = terms * 86400;

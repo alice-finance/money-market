@@ -2,7 +2,7 @@ const { constants, BN } = require("openzeppelin-test-helpers");
 const { expect } = require("chai");
 const { MAX_UINT256 } = constants;
 
-const SavingsInterestCalculatorV1 = artifacts.require("contracts/calculator/SavingsInterestCalculatorV1.sol");
+const SavingsInterestCalculatorV1 = artifacts.require("calculator/SavingsInterestCalculatorV1.sol");
 
 function getExpectedBalance(principal, rate, terms) {
   return new BN(Array.from({ length: terms }).reduce(a => Math.floor(a * (1 + rate)), principal));

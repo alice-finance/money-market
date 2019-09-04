@@ -1,6 +1,6 @@
 pragma solidity 0.5.8;
 
-import "../base/FallbackDispatcher.sol";
+import "../../base/FallbackDispatcher.sol";
 
 contract FallbackDispatcherMock is FallbackDispatcher {
     constructor() public {

@@ -2,9 +2,9 @@ const { constants, BN, expectEvent, expectRevert, time } = require("openzeppelin
 const { expect } = require("chai");
 
 const MoneyMarket = artifacts.require("MoneyMarket.sol");
-const ERC20 = artifacts.require("mock/ERC20Mock.sol");
-const ERC20Invalid = artifacts.require("mock/ERC20MockInvalid.sol");
-const ERC20Fails = artifacts.require("mock/ERC20MockFails.sol");
+const ERC20 = artifacts.require("mock/token/ERC20Mock.sol");
+const ERC20Invalid = artifacts.require("mock/token/ERC20MockInvalid.sol");
+const ERC20Fails = artifacts.require("mock/token/ERC20MockFails.sol");
 const Calculator = artifacts.require("calculator/SavingsInterestCalculatorV1.sol");
 
 const { MAX_UINT256 } = constants;

@@ -1,7 +1,7 @@
 pragma solidity 0.5.8;
 pragma experimental ABIEncoderV2;
 
-import "../base/DelegatedBase.sol";
+import "../../base/DelegatedBase.sol";
 
 contract DelegatedMockV0 is DelegatedBase {
     function initialize() public {
