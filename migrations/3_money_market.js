@@ -4,6 +4,8 @@ const SavingsInterestCalculator = artifacts.require("calculator/SavingsInterestC
 const ERC20Mock = artifacts.require("mock/ERC20Mock.sol");
 
 module.exports = async function(deployer, network, [admin]) {
+  let daiAddress;
+  let ownerAddress;
   if (["development", "localdev", "coverage"].includes(network)) {
     let dai;
     try {

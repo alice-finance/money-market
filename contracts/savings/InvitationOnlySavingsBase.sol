@@ -1,18 +1,12 @@
 pragma solidity 0.5.8;
 pragma experimental ABIEncoderV2;
 
-import "./IMoneyMarket.sol";
-import "./IInvitationManager.sol";
+import "./DelegatedSavingsBase.sol";
+import "../marketing/IInvitationManager.sol";
+import "../marketing/InvitationManagerBase.sol";
 
-contract InvitationManager is IInvitationManager {
-    IMoneyMarket private _market;
+contract InvitationOnlySavingsBase is DelegatedSavingsBase, IInvitationManager {
     uint256 private _amountOfSavingsPerInvite;
-    address private _owner;
-
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
 
     mapping(address => address) private _inviter;
     mapping(address => bool) private _redeemed;
@@ -21,32 +15,6 @@ contract InvitationManager is IInvitationManager {
 
     address[] private _inviterList;
     uint256 private _totalRedeemed;
-
-    constructor(address marketAddress, uint256 amountOfSavingsPerInvite)
-        public
-    {
-        _owner = msg.sender;
-        _market = IMoneyMarket(marketAddress);
-        _amountOfSavingsPerInvite = amountOfSavingsPerInvite;
-    }
-
-    function owner() public view returns (address) {
-        return _owner;
-    }
-
-    modifier onlyOwner() {
-        require(isOwner(), "InvitationManager: not called from owner");
-        _;
-    }
-
-    function isOwner() public view returns (bool) {
-        return msg.sender == _owner;
-    }
-
-    function transferOwnership(address newOwner) public onlyOwner {
-        emit OwnershipTransferred(_owner, newOwner);
-        _owner = newOwner;
-    }
 
     function amountOfSavingsPerInvite() public view returns (uint256) {
         return _amountOfSavingsPerInvite;
@@ -64,8 +32,9 @@ contract InvitationManager is IInvitationManager {
     }
 
     function invitationSlots(address account) public view returns (uint256) {
-        IMoneyMarket.SavingsRecord[] memory records = _market.getSavingsRecords(
-            account
+        SavingsRecord[] memory records = getSavingsRecordsWithData(
+            account,
+            new bytes(0)
         );
 
         if (records.length > 0) {
@@ -150,7 +119,7 @@ contract InvitationManager is IInvitationManager {
     {
         address currentInviter = address(bytes20(promoCode));
         uint96 nonce = uint96(
-            bytes12(bytes32(uint256(promoCode) * uint256(2**(160))))
+            bytes12(bytes32(uint256(promoCode) * uint256(2 ** (160))))
         );
 
         return (currentInviter, nonce);

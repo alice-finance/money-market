@@ -1,0 +1,18 @@
+Base
+    uint256 public constant DECIMALS = 18;
+    uint256 public constant MULTIPLIER = 10 ** DECIMALS;
+    address internal _owner;
+    IERC20 internal _asset;
+    IInterestCalculator internal _savingsInterestCalculator;
+    address internal _loan;
+    uint256 internal _totalFunds;
+    uint256 internal _totalBorrows;
+    uint256 internal _earnedInterests;
+    uint256 internal _paidInterests;
+    SavingsRecord[] internal _savingsRecords;
+    mapping(address => uint256[]) internal _userSavingsRecordIds;
+    uint256 internal _guardCounter;
+FallbackDispatcher
+SavingsBase
+Savings
+MoneyMarket

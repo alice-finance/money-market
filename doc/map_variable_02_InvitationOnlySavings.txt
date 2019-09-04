@@ -1,0 +1,31 @@
+Base
+	uint256 public constant DECIMALS = 18;
+    uint256 public constant MULTIPLIER = 10 ** DECIMALS;
+    address internal _owner;
+    IERC20 internal _asset;
+    IInterestCalculator internal _savingsInterestCalculator;
+    address internal _loan;
+    uint256 internal _totalFunds;
+    uint256 internal _totalBorrows;
+    uint256 internal _earnedInterests;
+    uint256 internal _paidInterests;
+    SavingsRecord[] internal _savingsRecords;
+    mapping(address => uint256[]) internal _userSavingsRecordIds;
+    uint256 internal _guardCounter;
+DelegatedBase
+    uint256 internal _version;
+ISavings
+DelegatedSavingsBase
+    IInterestCalculator internal _delegatedSavingsCalculator;
+    uint256 internal _minimumSavingsAmount;
+IInvitationManager
+InvitationManagerBase
+    uint256 private _amountOfSavingsPerInvite;
+    mapping(address => address) private _inviter;
+    mapping(address => bool) private _redeemed;
+    mapping(address => address[]) private _redemptions;
+    mapping(address => mapping(uint96 => bool)) private _nonceUsage;
+    address[] private _inviterList;
+    uint256 private _totalRedeemed;
+InvitationManager
+InvitationOnlySavings

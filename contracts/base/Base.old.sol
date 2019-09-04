@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "../calculator/IInterestCalculator.sol";
 import "../savings/ISavings.sol";
 
-contract Base is ISavings {
+contract Base {
     uint256 public constant DECIMALS = 18;
     uint256 public constant MULTIPLIER = 10 ** DECIMALS;
 
@@ -19,6 +19,16 @@ contract Base is ISavings {
 
     uint256 internal _earnedInterests;
     uint256 internal _paidInterests;
+
+    struct SavingsRecord {
+        uint256 id;
+        address owner;
+        uint256 interestRate;
+        uint256 balance;
+        uint256 principal;
+        uint256 initialTimestamp;
+        uint256 lastTimestamp;
+    }
 
     SavingsRecord[] internal _savingsRecords;
     mapping(address => uint256[]) internal _userSavingsRecordIds;

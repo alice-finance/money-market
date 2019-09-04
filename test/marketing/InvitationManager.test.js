@@ -1,7 +1,7 @@
 const { BN, expectEvent, expectRevert } = require("openzeppelin-test-helpers");
 const { expect } = require("chai");
 
-const InvitationManager = artifacts.require("marketing/InvitationManager.sol");
+const InvitationManager = artifacts.require("marketing/InvitationManager.sol.old");
 const MarketMock = artifacts.require("mock/MarketMock.sol");
 
 const ZERO = new BN(0);

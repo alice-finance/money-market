@@ -1,0 +1,30 @@
+Base
+    function owner() public view returns (address);
+    modifier onlyOwner();
+    function isOwner() public view returns (bool);
+    function transferOwnership(address newOwner) public onlyOwner;
+    modifier nonReentrant();
+    function asset() public view returns (IERC20);
+    function loan() public view returns (address);
+    function setLoan(address newLoanAddress) public onlyOwner;
+    function savingsCalculator() public view returns (IInterestCalculator);
+    function setSavingsCalculator(IInterestCalculator calculator) public onlyOwner;
+    function totalFunds() public view returns (uint256);
+    function totalBorrows() public view returns (uint256);
+FallbackDispatcher is Base {
+    function() external payable;
+SavingsBase
+Savings
+    function deposit(uint256 amount) public returns (uint256);
+    function withdraw(uint256 recordId, uint256 amount) public returns (bool);
+    function getSavingsRecordIds(address user) public view returns (uint256[] memory);
+    function getSavingsRecords(address user) public view returns (SavingsRecord[] memory);
+    function getSavingsRecord(uint256 recordId) public view returns (SavingsRecord memory);
+    function getRawSavingsRecords(address user) public view returns (SavingsRecord[] memory);
+    function getRawSavingsRecord(uint256 recordId) public view returns (SavingsRecord memory);
+    function getCurrentSavingsInterestRate() public view returns (uint256);
+    function getCurrentSavingsAPR() public view returns (uint256);
+    function getExpectedSavingsInterestRate(uint256 amount) public view returns (uint256);
+    function getExpectedSavingsAPR(uint256 amount) public view returns (uint256);
+MoneyMarket
+    constructor(address ownerAddress, address assetAddress, address savingsInterestCalculatorAddress) public;
