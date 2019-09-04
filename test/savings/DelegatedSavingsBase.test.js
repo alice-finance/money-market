@@ -24,14 +24,15 @@ const DAYS_30 = time.duration.days(30);
 const DAYS_365 = time.duration.days(365);
 const DAYS = [DAYS_10, DAYS_30, DAYS_365];
 const MINIMUM_SAVINGS_AMOUNT = MULTIPLIER.mul(new BN(100));
+const ZERO_BYTES = [0x00];
 
-contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insufficient_user]) {
+contract("Savings", function([owner, user1, user2, user3, user4, not_allowed_user, insufficient_user]) {
   before(async function() {
     this.dai = await ERC20.new("DAI Stable Token", "DAI", 18);
     this.calculator = await Calculator.new();
     this.zeroCalculator = await ZeroCalculator.new();
 
-    this.users = [user1, user2, user3, not_allowed_user];
+    this.users = [user1, user2, user3, user4, not_allowed_user];
 
     for (const [i, u] of this.users.entries()) {
       await this.dai.mint(u, MAX_AMOUNT, { from: owner });
@@ -41,7 +42,7 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
   beforeEach(async function() {
     this.base = await MoneyMarket.new(owner, this.dai.address, this.calculator.address);
 
-    for (const [i, u] of this.users.slice(0, 3).entries()) {
+    for (const [i, u] of this.users.slice(0, 4).entries()) {
       await this.dai.approve(this.base.address, MAX_UINT256, { from: u });
     }
 
@@ -53,9 +54,9 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
     await this.base.deposit(AMOUNT3, { from: user1 });
 
     this.records = {};
-    this.records[user1] = await this.base.getSavingsRecords(user1);
-    this.records[user2] = await this.base.getSavingsRecords(user2);
-    this.records[user3] = await this.base.getSavingsRecords(user3);
+    this.records[user1] = await this.base.getRawSavingsRecords(user1);
+    this.records[user2] = await this.base.getRawSavingsRecords(user2);
+    this.records[user3] = await this.base.getRawSavingsRecords(user3);
 
     this.savings = await Savings.new();
     await this.base.setLoan(this.savings.address);
@@ -72,6 +73,28 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
     expect(await this.base.savingsCalculator()).to.be.equal(this.zeroCalculator.address);
     expect(await this.market.savingsInterestCalculator()).to.be.equal(this.calculator.address);
     expect(await this.market.minimumSavingsAmount()).to.be.bignumber.equal(MINIMUM_SAVINGS_AMOUNT);
+
+    let recordsAfter = {};
+    recordsAfter[user1] = await this.market.getRawSavingsRecordsWithData(user1, ZERO_BYTES);
+    recordsAfter[user2] = await this.market.getRawSavingsRecordsWithData(user2, ZERO_BYTES);
+    recordsAfter[user3] = await this.market.getRawSavingsRecordsWithData(user3, ZERO_BYTES);
+
+    expect(recordsAfter[user1]).to.be.deep.equal(this.records[user1]);
+    expect(recordsAfter[user2]).to.be.deep.equal(this.records[user2]);
+    expect(recordsAfter[user3]).to.be.deep.equal(this.records[user3]);
+
+    await this.market.depositWithData(AMOUNT1, ZERO_BYTES, { from: user4 });
+    await this.market.depositWithData(AMOUNT2, ZERO_BYTES, { from: user4 });
+    await this.market.depositWithData(AMOUNT3, ZERO_BYTES, { from: user4 });
+
+    recordsAfter = {};
+    recordsAfter[user1] = await this.market.getRawSavingsRecordsWithData(user1, ZERO_BYTES);
+    recordsAfter[user2] = await this.market.getRawSavingsRecordsWithData(user2, ZERO_BYTES);
+    recordsAfter[user3] = await this.market.getRawSavingsRecordsWithData(user3, ZERO_BYTES);
+
+    expect(recordsAfter[user1]).to.be.deep.equal(this.records[user1]);
+    expect(recordsAfter[user2]).to.be.deep.equal(this.records[user2]);
+    expect(recordsAfter[user3]).to.be.deep.equal(this.records[user3]);
   });
 
   // it("should get same interest rate", async function() {
