@@ -62,9 +62,29 @@ contract DelegatedSavingsBase is DelegatedBase {
         _minimumSavingsAmount = amount;
     }
 
+    /** ISavings Interface */
+    function depositWithData(uint256 amount, bytes memory data)
+        public
+        delegated
+        initialized
+        returns (uint256)
+    {
+        return _deposit(msg.sender, amount, data);
+    }
+
+    function withdrawWithData(
+        uint256 recordId,
+        uint256 amount,
+        bytes memory data
+    ) public delegated initialized returns (bool) {
+        return _withdraw(msg.sender, recordId, amount, data);
+    }
+
     function getSavingsRecordIdsWithData(address user, bytes memory data)
         public
         view
+        delegated
+        initialized
         returns (uint256[] memory)
     {
         return _userSavingsRecordIds[user];
@@ -73,6 +93,8 @@ contract DelegatedSavingsBase is DelegatedBase {
     function getSavingsRecordsWithData(address user, bytes memory data)
         public
         view
+        delegated
+        initialized
         returns (SavingsRecord[] memory)
     {
         uint256[] storage ids = _userSavingsRecordIds[user];
@@ -88,6 +110,8 @@ contract DelegatedSavingsBase is DelegatedBase {
     function getSavingsRecordWithData(uint256 recordId, bytes memory data)
         public
         view
+        delegated
+        initialized
         returns (SavingsRecord memory)
     {
         require(recordId < _savingsRecords.length, "invalid recordId");
@@ -99,9 +123,11 @@ contract DelegatedSavingsBase is DelegatedBase {
         return record;
     }
 
-    function getRawSavingsRecords(address user)
+    function getRawSavingsRecordsWithData(address user, bytes memory data)
         public
         view
+        delegated
+        initialized
         returns (SavingsRecord[] memory)
     {
         uint256[] storage ids = _userSavingsRecordIds[user];
@@ -114,22 +140,36 @@ contract DelegatedSavingsBase is DelegatedBase {
         return records;
     }
 
-    function getRawSavingsRecord(uint256 recordId)
+    function getRawSavingsRecordWithData(uint256 recordId, bytes memory data)
         public
         view
+        delegated
+        initialized
         returns (SavingsRecord memory)
     {
         require(recordId < _savingsRecords.length, "invalid recordId");
         return _savingsRecords[recordId];
     }
 
-    function getCurrentSavingsInterestRate() public view returns (uint256) {
+    function getCurrentSavingsInterestRateWithData(bytes memory data)
+        public
+        view
+        delegated
+        initialized
+        returns (uint256)
+    {
         return _calculateSavingsInterestRate(MULTIPLIER);
     }
 
-    function getCurrentSavingsAPR() public view returns (uint256) {
+    function getCurrentSavingsAPRWithData(bytes memory data)
+        public
+        view
+        delegated
+        initialized
+        returns (uint256)
+    {
         return
-            _savingsInterestCalculator.getExpectedBalance(
+            _delegatedSavingsInterestCalculator.getExpectedBalance(
                     MULTIPLIER,
                     _calculateSavingsInterestRate(MULTIPLIER),
                     365 days
@@ -137,12 +177,27 @@ contract DelegatedSavingsBase is DelegatedBase {
                 MULTIPLIER;
     }
 
-    function getExpectedSavingsInterestRate(uint256 amount)
+    function getExpectedSavingsInterestRateWithData(
+        uint256 amount,
+        bytes memory data
+    ) public view delegated initialized returns (uint256) {
+        return _calculateSavingsInterestRate(amount);
+    }
+
+    function getExpectedSavingsAPRWithData(uint256 amount, bytes memory data)
         public
         view
+        delegated
+        initialized
         returns (uint256)
     {
-        return _calculateSavingsInterestRate(amount);
+        return
+            _delegatedSavingsInterestCalculator.getExpectedBalance(
+                    MULTIPLIER,
+                    _calculateSavingsInterestRate(amount),
+                    365 days
+                ) -
+                MULTIPLIER;
     }
 
     /** Internal functions */
@@ -239,7 +294,7 @@ contract DelegatedSavingsBase is DelegatedBase {
         returns (uint256)
     {
         return
-            _savingsInterestCalculator.getExpectedBalance(
+            _delegatedSavingsInterestCalculator.getExpectedBalance(
                 record.balance,
                 record.interestRate,
                 block.timestamp - record.lastTimestamp
@@ -252,79 +307,10 @@ contract DelegatedSavingsBase is DelegatedBase {
         returns (uint256)
     {
         return
-            _savingsInterestCalculator.getInterestRate(
+            _delegatedSavingsInterestCalculator.getInterestRate(
                 _totalFunds,
                 _totalBorrows,
                 amount
             );
-    }
-
-    function depositWithData(uint256 amount, bytes memory data)
-        public
-        delegated
-        checkVersion(1)
-        returns (uint256)
-    {
-        return _deposit(msg.sender, amount, data);
-    }
-
-    function withdrawWithData(
-        uint256 recordId,
-        uint256 amount,
-        bytes memory data
-    ) public delegated checkVersion(1) returns (bool) {
-        return _withdraw(msg.sender, recordId, amount, data);
-    }
-
-    function getCurrentSavingsInterestRateWithData(bytes memory data)
-        public
-        view
-        delegated
-        checkVersion(1)
-        returns (uint256)
-    {
-        return _calculateSavingsInterestRate(MULTIPLIER);
-    }
-
-    function getCurrentSavingsAPRWithData(bytes memory data)
-        public
-        view
-        delegated
-        checkVersion(1)
-        returns (uint256)
-    {
-        return
-            _delegatedSavingsInterestCalculator.getExpectedBalance(
-                    MULTIPLIER,
-                    _calculateSavingsInterestRate(MULTIPLIER),
-                    365 days
-                ) -
-                MULTIPLIER;
-    }
-
-    function getExpectedSavingsInterestRateWithData(uint256 amount)
-        public
-        view
-        delegated
-        checkVersion(1)
-        returns (uint256)
-    {
-        return _calculateSavingsInterestRate(amount);
-    }
-
-    function getExpectedSavingsAPRWithData(uint256 amount)
-        public
-        view
-        delegated
-        checkVersion(1)
-        returns (uint256)
-    {
-        return
-            _delegatedSavingsInterestCalculator.getExpectedBalance(
-                    MULTIPLIER,
-                    _calculateSavingsInterestRate(amount),
-                    365 days
-                ) -
-                MULTIPLIER;
     }
 }
