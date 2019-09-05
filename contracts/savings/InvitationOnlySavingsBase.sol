@@ -3,7 +3,6 @@ pragma experimental ABIEncoderV2;
 
 import "./DelegatedSavingsBase.sol";
 import "../marketing/IInvitationManager.sol";
-import "../marketing/InvitationManagerBase.sol";
 
 contract InvitationOnlySavingsBase is DelegatedSavingsBase, IInvitationManager {
     uint256 internal _amountOfSavingsPerInvite;

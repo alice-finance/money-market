@@ -161,7 +161,7 @@ contract("Savings", function([owner, user1, user2, user3, not_allowed_user, insu
         await expectRevert(this.market.deposit(AMOUNT1, { from: insufficient_user }), "insufficient fund");
       });
 
-      it("should not deposit when user does not approved bank", async function() {
+      it("should not deposit when user does not approved money market", async function() {
         await expectRevert(this.market.deposit(AMOUNT1, { from: not_allowed_user }), "allowance not met");
       });
 

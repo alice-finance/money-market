@@ -1,7 +1,7 @@
 const { BN, expectEvent, expectRevert, time } = require("openzeppelin-test-helpers");
 const { expect } = require("chai");
 
-const Savings = artifacts.require("savings/InvitationOnlySavings.sol");
+const Savings = artifacts.require("mock/savings/InvitationOnlySavingsMock.sol");
 const ERC20 = artifacts.require("mock/token/ERC20Mock.sol");
 const MoneyMarket = artifacts.require("MoneyMarket.sol");
 const Calculator = artifacts.require("calculator/SavingsInterestCalculatorV1.sol");
@@ -44,8 +44,8 @@ contract("InvitationOnlySavings.invitation", function([admin, inviter1, inviter2
     this.savings = await Savings.new();
     await this.base.setLoan(this.savings.address);
     this.market = await Savings.at(this.base.address);
-
     await this.market.initialize(this.calculator.address, MINIMUM_SAVINGS_AMOUNT);
+    await this.market.setSavingsCalculator(this.zeroCalculator.address);
 
     for (const [i, u] of this.users.entries()) {
       await this.dai.approve(this.market.address, MAX_UINT256, { from: u });
