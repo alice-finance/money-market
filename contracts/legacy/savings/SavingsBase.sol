@@ -88,7 +88,10 @@ contract SavingsBase is FallbackDispatcher {
         uint256 currentBalance = _getCurrentSavingsBalance(record);
 
         require(currentBalance >= amount, "insufficient balance");
-        require(asset().balanceOf(address(this)) >= amount, "insufficient fund");
+        require(
+            asset().balanceOf(address(this)) >= amount,
+            "insufficient fund"
+        );
 
         _totalFunds = _totalFunds.sub(record.balance).add(currentBalance).sub(
             amount
@@ -116,11 +119,12 @@ contract SavingsBase is FallbackDispatcher {
         view
         returns (uint256)
     {
-        return _savingsInterestCalculator.getExpectedBalance(
-            record.balance,
-            record.interestRate,
-            block.timestamp - record.lastTimestamp
-        );
+        return
+            _savingsInterestCalculator.getExpectedBalance(
+                record.balance,
+                record.interestRate,
+                block.timestamp - record.lastTimestamp
+            );
     }
 
     function _calculateSavingsInterestRate(uint256 amount)
@@ -128,10 +132,11 @@ contract SavingsBase is FallbackDispatcher {
         view
         returns (uint256)
     {
-        return _savingsInterestCalculator.getInterestRate(
-            _totalFunds,
-            _totalBorrows,
-            amount
-        );
+        return
+            _savingsInterestCalculator.getInterestRate(
+                _totalFunds,
+                _totalBorrows,
+                amount
+            );
     }
 }

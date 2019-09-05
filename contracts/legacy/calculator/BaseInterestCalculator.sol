@@ -4,7 +4,7 @@ import "./IInterestCalculator.sol";
 
 contract BaseInterestCalculator is IInterestCalculator {
     uint256 public constant DECIMALS = 18;
-    uint256 public constant MULTIPLIER = 10**DECIMALS;
+    uint256 public constant MULTIPLIER = 10 ** DECIMALS;
 
     function getInterestRate(
         uint256, /* totalSavings */
@@ -43,8 +43,8 @@ contract BaseInterestCalculator is IInterestCalculator {
     {
         uint256 balance = principal;
 
-        for (uint256 i = 0; i < terms; i++) {
-            balance = (balance * (MULTIPLIER + rate)) / MULTIPLIER;
+        for (uint i = 0; i < terms; i++) {
+            balance = balance * (MULTIPLIER + rate) / MULTIPLIER;
         }
 
         return balance;

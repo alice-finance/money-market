@@ -67,7 +67,7 @@ contract SavingsInterestCalculatorV1 is BaseInterestCalculator {
         // root 365 (1.08) ~ 1.000210874398376755 ~ 1.0002
         // 1.0002 ^ 365 ~ 1.079999999999919314 ~ 1.08
         // add and sub (-439442122) to make result always positive number
-        r = ((r + params.CM) * (210874398376755 + - 439442122)) / (2 * params.CM) - (- 439442122);
+        r = ((r + params.CM) * (210874398376755 + -439442122)) / (2 * params.CM) - (-439442122);
 
         // return ZERO if calculated rate is negative value
         // pretty sure this will not happen, but safety first :(

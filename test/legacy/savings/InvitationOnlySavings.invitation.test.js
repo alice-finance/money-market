@@ -25,7 +25,7 @@ const generateSignature = async (hash, address) => {
   return await web3.eth.sign(hash, address);
 };
 
-contract("InvitationOnlySavings.invitation", function([admin, inviter1, inviter2, invitee1, invitee2, invitee3]) {
+contract("InvitationOnlySavings.sol.invitation", function([admin, inviter1, inviter2, invitee1, invitee2, invitee3]) {
   before(async function() {
     this.dai = await ERC20.new("DAI Stable Token", "DAI", 18);
     this.calculator = await Calculator.new();

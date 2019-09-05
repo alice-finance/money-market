@@ -3,7 +3,7 @@ const { expect } = require("chai");
 
 const MoneyMarket = artifacts.require("MoneyMarket.sol");
 const InvitationManager = artifacts.require("mock/InvitationManagerMock.sol");
-const SavingsV2 = artifacts.require("savings/InvitationOnlySavings.sol");
+const SavingsV2 = artifacts.require("savings/InvitationOnlySavings.sol.sol");
 const ERC20 = artifacts.require("mock/token/ERC20Mock.sol");
 const ERC20Invalid = artifacts.require("mock/token/ERC20MockInvalid.sol");
 const ERC20Fails = artifacts.require("mock/token/ERC20MockFails.sol");

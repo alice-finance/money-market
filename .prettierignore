@@ -1,3 +1,4 @@
 node_modules/
+contracts/legacy/calculator/SavingsInterestCalculatorV1.sol
 contracts/calculator/SavingsInterestCalculatorV1.sol
 out/
