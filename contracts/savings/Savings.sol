@@ -4,15 +4,16 @@ pragma experimental ABIEncoderV2;
 import "../base/Fund.sol";
 import "./SavingsData.sol";
 import "../ReentrancyGuard.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract Savings is Fund, SavingsData, ReentrancyGuard {
+    using SafeMath for uint256;
     IInterestCalculator internal _newSavingsCalculator;
 
-    function savingsCalculatorWithData(bytes memory data)
+    function savingsCalculatorWithData(bytes memory /* data */)
         public
         view
         delegated
-        initialized
         returns (IInterestCalculator)
     {
         return _newSavingsCalculator;
@@ -20,8 +21,8 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
 
     function setSavingsCalculatorWithData(
         IInterestCalculator calculator,
-        bytes memory data
-    ) public delegated initialized onlyOwner {
+        bytes memory /* data */
+    ) public delegated onlyOwner {
         require(address(calculator) != address(0), "ZERO address");
 
         emit SavingsCalculatorChanged(
@@ -34,7 +35,6 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
     function depositWithData(uint256 amount, bytes memory data)
         public
         delegated
-        initialized
         returns (uint256)
     {
         return _deposit(msg.sender, amount, data);
@@ -44,15 +44,14 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
         uint256 recordId,
         uint256 amount,
         bytes memory data
-    ) public delegated initialized returns (bool) {
+    ) public delegated returns (bool) {
         return _withdraw(msg.sender, recordId, amount, data);
     }
 
-    function getSavingsRecordIdsWithData(address user, bytes memory data)
+    function getSavingsRecordIdsWithData(address user, bytes memory /* data */)
         public
         view
         delegated
-        initialized
         returns (uint256[] memory)
     {
         return _userSavingsRecordIds[user];
@@ -62,7 +61,6 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
         public
         view
         delegated
-        initialized
         returns (SavingsRecord[] memory)
     {
         uint256[] storage ids = _userSavingsRecordIds[user];
@@ -75,11 +73,10 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
         return records;
     }
 
-    function getSavingsRecordWithData(uint256 recordId, bytes memory data)
+    function getSavingsRecordWithData(uint256 recordId, bytes memory /* data */)
         public
         view
         delegated
-        initialized
         returns (SavingsRecord memory)
     {
         require(recordId < _savingsRecords.length, "invalid recordId");
@@ -91,11 +88,10 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
         return record;
     }
 
-    function getRawSavingsRecordsWithData(address user, bytes memory data)
+    function getRawSavingsRecordsWithData(address user, bytes memory /* data */)
         public
         view
         delegated
-        initialized
         returns (SavingsRecord[] memory)
     {
         uint256[] storage ids = _userSavingsRecordIds[user];
@@ -108,32 +104,29 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
         return records;
     }
 
-    function getRawSavingsRecordWithData(uint256 recordId, bytes memory data)
+    function getRawSavingsRecordWithData(uint256 recordId, bytes memory /* data */)
         public
         view
         delegated
-        initialized
         returns (SavingsRecord memory)
     {
         require(recordId < _savingsRecords.length, "invalid recordId");
         return _savingsRecords[recordId];
     }
 
-    function getCurrentSavingsInterestRateWithData(bytes memory data)
+    function getCurrentSavingsInterestRateWithData(bytes memory /* data */)
         public
         view
         delegated
-        initialized
         returns (uint256)
     {
         return _calculateSavingsInterestRate(MULTIPLIER);
     }
 
-    function getCurrentSavingsAPRWithData(bytes memory data)
+    function getCurrentSavingsAPRWithData(bytes memory /* data */)
         public
         view
         delegated
-        initialized
         returns (uint256)
     {
         return
@@ -147,16 +140,15 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
 
     function getExpectedSavingsInterestRateWithData(
         uint256 amount,
-        bytes memory data
-    ) public view delegated initialized returns (uint256) {
+        bytes memory /* data */
+    ) public view delegated returns (uint256) {
         return _calculateSavingsInterestRate(amount);
     }
 
-    function getExpectedSavingsAPRWithData(uint256 amount, bytes memory data)
+    function getExpectedSavingsAPRWithData(uint256 amount, bytes memory /* data */)
         public
         view
         delegated
-        initialized
         returns (uint256)
     {
         return
@@ -168,11 +160,57 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
                 MULTIPLIER;
     }
 
+    function _deposit(address user, uint256 amount, bytes memory /* data */)
+        internal
+        nonReentrant
+        returns (uint256)
+    {
+        require(amount > 0, "invalid amount");
+
+        uint256 recordId = _savingsRecords.length;
+        _savingsRecords.length += 1;
+
+        _savingsRecords[recordId].id = recordId;
+        _savingsRecords[recordId].owner = user;
+        _savingsRecords[recordId].interestRate = _calculateSavingsInterestRate(
+            amount
+        );
+        _savingsRecords[recordId].balance = amount;
+        _savingsRecords[recordId].principal = amount;
+        _savingsRecords[recordId].initialTimestamp = block.timestamp;
+        _savingsRecords[recordId].lastTimestamp = block.timestamp;
+
+        _userSavingsRecordIds[user].push(recordId);
+
+        _totalFunds = _totalFunds.add(amount);
+
+        require(asset().balanceOf(user) >= amount, "insufficient fund");
+        require(
+            asset().allowance(user, address(this)) >= amount,
+            "allowance not met"
+        );
+
+        require(
+            asset().transferFrom(user, address(this), amount),
+            "transferFrom failed"
+        );
+
+        emit SavingsDeposited(
+            recordId,
+            user,
+            amount,
+            _savingsRecords[recordId].interestRate,
+            block.timestamp
+        );
+
+        return recordId;
+    }
+
     function _withdraw(
         address user,
         uint256 recordId,
         uint256 amount,
-        bytes memory data
+        bytes memory /* data */
     ) internal nonReentrant returns (bool) {
         require(recordId < _savingsRecords.length, "invalid recordId");
 

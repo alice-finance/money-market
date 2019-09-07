@@ -102,7 +102,7 @@ contract("InvitationOnlySavings.sol.invitation", function([admin, inviter1, invi
   it("should redeem code", async function() {
     await this.market.setSavingsRecord(1, inviter1, AMOUNT_PER_INVITE.mul(new BN(3)), 0);
 
-    expect(await this.market.redemptionCount(inviter1)).to.be.bignumber.equal(new BN(0));
+    expect(await this.market.redeemerCount(inviter1)).to.be.bignumber.equal(new BN(0));
     expect(await this.market.invitationSlots(inviter1)).to.be.bignumber.equal(new BN(3));
     expect(await this.market.totalRedeemed()).to.be.bignumber.equal(new BN(0));
 
@@ -119,8 +119,8 @@ contract("InvitationOnlySavings.sol.invitation", function([admin, inviter1, invi
 
     expect(await this.market.isRedeemed(invitee1)).to.be.true;
     expect(await this.market.inviter1(invitee1)).to.be.equal(inviter1);
-    expect((await this.market.redemptions(inviter1))[0]).to.be.equal(invitee1);
-    expect(await this.market.redemptionCount(inviter1)).to.be.bignumber.equal(new BN(1));
+    expect((await this.market.redeemers(inviter1))[0]).to.be.equal(invitee1);
+    expect(await this.market.redeemerCount(inviter1)).to.be.bignumber.equal(new BN(1));
     expect(await this.market.invitationSlots(inviter1)).to.be.bignumber.equal(new BN(3));
     expect(await this.market.totalRedeemed()).to.be.bignumber.equal(new BN(1));
   });

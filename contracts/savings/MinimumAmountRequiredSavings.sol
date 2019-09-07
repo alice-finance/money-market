@@ -12,7 +12,7 @@ contract MinimumAmountRequiredSavings is Savings {
         public
         view
         delegated
-        initialized
+
         returns (uint256)
     {
         return _minimumSavingsAmount;
@@ -21,7 +21,7 @@ contract MinimumAmountRequiredSavings is Savings {
     function setMinimumSavingsAmount(uint256 amount)
         public
         delegated
-        initialized
+
         onlyOwner
     {
         emit MinimumSavingsAmountChanged(_minimumSavingsAmount, amount);

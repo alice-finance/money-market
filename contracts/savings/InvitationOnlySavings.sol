@@ -2,7 +2,7 @@ pragma solidity 0.5.8;
 pragma experimental ABIEncoderV2;
 
 import "./MinimumAmountRequiredSavings.sol";
-import "../marketing/IInvitationManager.sol";
+import "../invitation/IInvitationManager.sol";
 
 contract InvitationOnlySavings is
     MinimumAmountRequiredSavings,
@@ -12,7 +12,7 @@ contract InvitationOnlySavings is
 
     mapping(address => address) internal _inviter;
     mapping(address => bool) internal _redeemed;
-    mapping(address => address[]) internal _redemptions;
+    mapping(address => address[]) internal _redeemers;
     mapping(address => mapping(uint96 => bool)) internal _nonceUsage;
 
     address[] internal _inviterList;
@@ -22,7 +22,7 @@ contract InvitationOnlySavings is
         public
         view
         delegated
-        initialized
+
         returns (uint256)
     {
         return _amountOfSavingsPerInvite;
@@ -31,7 +31,7 @@ contract InvitationOnlySavings is
     function setAmountOfSavingsPerInvite(uint256 amount)
         public
         delegated
-        initialized
+
         onlyOwner
     {
         require(amount > 0, "InvitationManager: amount is ZERO");
@@ -44,7 +44,7 @@ contract InvitationOnlySavings is
         public
         view
         delegated
-        initialized
+
         returns (address)
     {
         return _inviter[account];
@@ -54,7 +54,7 @@ contract InvitationOnlySavings is
         public
         view
         delegated
-        initialized
+
         returns (uint256)
     {
         SavingsRecord[] memory records = getSavingsRecordsWithData(
@@ -78,35 +78,35 @@ contract InvitationOnlySavings is
         public
         view
         delegated
-        initialized
+
         returns (bool)
     {
         return _redeemed[account];
     }
 
-    function redemptions(address account)
+    function redeemers(address account)
         public
         view
         returns (address[] memory)
     {
-        return _redemptions[account];
+        return _redeemers[account];
     }
 
-    function redemptionCount(address account)
+    function redeemerCount(address account)
         public
         view
         delegated
-        initialized
+
         returns (uint256)
     {
-        return _redemptions[account].length;
+        return _redeemers[account].length;
     }
 
     function totalRedeemed()
         public
         view
         delegated
-        initialized
+
         returns (uint256)
     {
         return _totalRedeemed;
@@ -115,7 +115,7 @@ contract InvitationOnlySavings is
     function depositWithData(uint256 amount, bytes memory data)
         public
         delegated
-        initialized
+
         returns (uint256)
     {
         require(isRedeemed(msg.sender), "User not redeemed");
@@ -126,7 +126,7 @@ contract InvitationOnlySavings is
     function redeem(bytes32 promoCode, bytes memory signature)
         public
         delegated
-        initialized
+
         returns (bool)
     {
         (address currentInviter, uint96 nonce) = _extractCode(promoCode);
@@ -152,7 +152,7 @@ contract InvitationOnlySavings is
         );
 
         _inviter[msg.sender] = currentInviter;
-        _redemptions[currentInviter].push(msg.sender);
+        _redeemers[currentInviter].push(msg.sender);
         _nonceUsage[currentInviter][nonce] = true;
         _redeemed[msg.sender] = true;
 

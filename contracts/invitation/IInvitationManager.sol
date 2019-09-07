@@ -18,11 +18,11 @@ interface IInvitationManager {
     function inviter(address account) external view returns (address);
     function invitationSlots(address account) external view returns (uint256);
     function isRedeemed(address account) external view returns (bool);
-    function redemptions(address account)
+    function redeemers(address account)
         external
         view
         returns (address[] memory);
-    function redemptionCount(address account) external view returns (uint256);
+    function redeemerCount(address account) external view returns (uint256);
     function totalRedeemed() external view returns (uint256);
     function redeem(bytes32 promoCode, bytes calldata signature)
         external

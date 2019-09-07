@@ -3,7 +3,7 @@ module.exports = {
     "Migrations.sol",
     "mock",
     "calculator/IInterestCalculator.sol",
-    "marketing/IInvitationManager.sol",
+    "invitation/IInvitationManager.sol",
     "savings/ISavings.sol"
   ]
 };

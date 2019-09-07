@@ -1,7 +1,7 @@
 @startuml
-class IInterestCalculator {
-+ getInterestRate
-+ getExpectedBalance
+interface IInterestCalculator {
++ getInterestRate()
++ getExpectedBalance()
 }
 
 class SavingsInterestCalculatorV1 {
@@ -10,7 +10,7 @@ class SavingsInterestCalculatorV1 {
 class ZeroSavingsInterestCalculator {
 }
 
-class ISavings {
+interface ISavings {
 + depositWithData()
 + withdrawWithData()
 + getSavingsRecordIdsWithData()
@@ -30,6 +30,7 @@ class Constants {
 }
 
 class Ownable {
+~ _owner
 + owner()
 + isOwner()
 + transferOwnership(address newOwner)
@@ -61,12 +62,12 @@ class MinimumAmountRequiredSavings {
 + setMinimumSavingsAmount(uint256 amount)
 }
 
-class IInvitationManager {
+interface IInvitationManager {
 + inviter()
 + invitationSlots()
 + isRedeemed()
-+ redemptions()
-+ redemptionCount()
++ redeemers()
++ redeemerCount()
 + totalRedeemed()
 + redeem()
 }

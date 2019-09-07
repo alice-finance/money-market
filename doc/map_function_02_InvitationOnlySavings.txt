@@ -27,7 +27,7 @@ InvitationOnlySavingsBase
     uint256 private _amountOfSavingsPerInvite;
     mapping(address => address) private _inviter;
     mapping(address => bool) private _redeemed;
-    mapping(address => address[]) private _redemptions;
+    mapping(address => address[]) private _redeemers;
     mapping(address => mapping(uint96 => bool)) private _nonceUsage;
     address[] private _inviterList;
     uint256 private _totalRedeemed;

@@ -10,19 +10,19 @@ contract DelegatedMockV0 is DelegatedBase {
 
     uint256 private _calleeStateVar0 = 100;
 
-    function increaseV0() public initialized delegated {
+    function increaseV0() public  delegated {
         _calleeStateVar0 += 1;
     }
 
-    function decreaseV0() public initialized delegated {
+    function decreaseV0() public  delegated {
         _calleeStateVar0 -= 1;
     }
 
-    function getValueV0() public view initialized delegated returns (uint256) {
+    function getValueV0() public view  delegated returns (uint256) {
         return _calleeStateVar0;
     }
 
-    function setValueV0(uint256 newValue) public initialized delegated {
+    function setValueV0(uint256 newValue) public  delegated {
         _calleeStateVar0 = newValue;
     }
 }

@@ -8,6 +8,13 @@ contract Upgradable is Asset {
     IInterestCalculator internal _savingsInterestCalculator; // DEPRECATED
     address internal _loan;
 
+    event SavingsCalculatorChanged(
+        address indexed previousCalculator,
+        address indexed newCalculator
+    );
+
+    event LoanChanged(address indexed previousLoan, address indexed newLoan);
+
     function loan() public view returns (address) {
         return _loan;
     }
@@ -34,5 +41,13 @@ contract Upgradable is Asset {
             address(calculator)
         );
         _savingsInterestCalculator = calculator;
+    }
+
+    modifier delegated() {
+        require(
+            _loan != address(0) && _loan != address(this),
+            "cannot call this contract directly"
+        );
+        _;
     }
 }
