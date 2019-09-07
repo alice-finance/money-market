@@ -36,7 +36,7 @@
     "husky": "^2.3.0",
     "loom-js": "^1.51.1",
     "loom-truffle-provider": "^0.13.0",
-    "openzeppelin-solidity": "^2.2.0",
+    "openzeppelin-solidity": "2.3.0",
     "openzeppelin-test-helpers": "^0.4.0",
     "prettier": "^1.17.1",
     "prettier-plugin-solidity": "^1.0.0-alpha.22",

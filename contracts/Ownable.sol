@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 import "./base/Constants.sol";
 
 contract Ownable is Constants {
-    address internal _owner;
+    address private _owner;
 
     event OwnershipTransferred(
         address indexed previousOwner,
@@ -16,7 +16,7 @@ contract Ownable is Constants {
     }
 
     modifier onlyOwner() {
-        require(isOwner(), "not called from owner");
+        require(isOwner(), "Ownable: not called from the owner");
         _;
     }
 

@@ -22,7 +22,6 @@ contract InvitationOnlySavings is
         public
         view
         delegated
-
         returns (uint256)
     {
         return _amountOfSavingsPerInvite;
@@ -31,7 +30,6 @@ contract InvitationOnlySavings is
     function setAmountOfSavingsPerInvite(uint256 amount)
         public
         delegated
-
         onlyOwner
     {
         require(amount > 0, "InvitationManager: amount is ZERO");
@@ -40,13 +38,7 @@ contract InvitationOnlySavings is
         _amountOfSavingsPerInvite = amount;
     }
 
-    function inviter(address account)
-        public
-        view
-        delegated
-
-        returns (address)
-    {
+    function inviter(address account) public view delegated returns (address) {
         return _inviter[account];
     }
 
@@ -54,7 +46,6 @@ contract InvitationOnlySavings is
         public
         view
         delegated
-
         returns (uint256)
     {
         SavingsRecord[] memory records = getSavingsRecordsWithData(
@@ -74,21 +65,11 @@ contract InvitationOnlySavings is
         return 0;
     }
 
-    function isRedeemed(address account)
-        public
-        view
-        delegated
-
-        returns (bool)
-    {
+    function isRedeemed(address account) public view delegated returns (bool) {
         return _redeemed[account];
     }
 
-    function redeemers(address account)
-        public
-        view
-        returns (address[] memory)
-    {
+    function redeemers(address account) public view returns (address[] memory) {
         return _redeemers[account];
     }
 
@@ -96,37 +77,31 @@ contract InvitationOnlySavings is
         public
         view
         delegated
-
         returns (uint256)
     {
         return _redeemers[account].length;
     }
 
-    function totalRedeemed()
-        public
-        view
-        delegated
-
-        returns (uint256)
-    {
+    function totalRedeemed() public view delegated returns (uint256) {
         return _totalRedeemed;
     }
 
     function depositWithData(uint256 amount, bytes memory data)
         public
         delegated
-
         returns (uint256)
     {
-        require(isRedeemed(msg.sender), "User not redeemed");
+        if (!isRedeemed(msg.sender)) {
+            (bytes32 promoCode, bytes memory signature) = _extractData(data);
+            redeem(promoCode, signature);
+        }
 
-        return _deposit(msg.sender, amount, data);
+        return super.depositWithData(amount, data);
     }
 
     function redeem(bytes32 promoCode, bytes memory signature)
         public
         delegated
-
         returns (bool)
     {
         (address currentInviter, uint96 nonce) = _extractCode(promoCode);
@@ -168,6 +143,28 @@ contract InvitationOnlySavings is
         return true;
     }
 
+    function _extractData(bytes memory data)
+        internal
+        pure
+        returns (bytes32, bytes memory)
+    {
+        require(data.length >= 32, "InvitationManager: invalid data");
+        uint256 signatureLength = data.length - 32;
+
+        bytes32 promoCode;
+        bytes memory signature = new bytes(signatureLength);
+
+        assembly {
+            promoCode := mload(add(data, 32))
+        }
+
+        for (uint256 i = 32; i < data.length; i++) {
+            signature[i - 32] = data[i];
+        }
+
+        return (promoCode, signature);
+    }
+
     function _extractCode(bytes32 promoCode)
         internal
         pure
@@ -175,7 +172,7 @@ contract InvitationOnlySavings is
     {
         address currentInviter = address(bytes20(promoCode));
         uint96 nonce = uint96(
-            bytes12(bytes32(uint256(promoCode) * uint256(2**(160))))
+            bytes12(bytes32(uint256(promoCode) * uint256(2 ** (160))))
         );
 
         return (currentInviter, nonce);

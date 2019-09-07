@@ -1,6 +1,6 @@
 require("dotenv").config();
 const MoneyMarket = artifacts.require("MoneyMarket.sol");
-const InvitationManager = artifacts.require("InvitationManager");
+// const InvitationManager = artifacts.require("InvitationManager");
 const ZeroSavingsInterestCalculator = artifacts.require("calculator/ZeroSavingsInterestCalculator.sol");
 const InvitationOnlySavings = artifacts.require("savings/InvitationOnlySavings.sol.sol");
 
