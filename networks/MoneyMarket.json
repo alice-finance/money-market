@@ -1,6 +1,127 @@
 {
   "9545242630824": {
-    "events": {},
+    "events": {
+      "0x7a78515c3ef713732b64c0f6842bebc1b13404c5ceb609183a1898f1f4145b27": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "name": "recordId",
+            "type": "uint256"
+          },
+          {
+            "indexed": true,
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "name": "balance",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "name": "SavingsDeposited",
+        "type": "event",
+        "signature": "0x7a78515c3ef713732b64c0f6842bebc1b13404c5ceb609183a1898f1f4145b27"
+      },
+      "0xb2691cef0b3c06c9e4570d77f68a7f4cf93963f6f92227e4204e6d6c58eede93": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "name": "recordId",
+            "type": "uint256"
+          },
+          {
+            "indexed": true,
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "name": "remainingBalance",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "name": "SavingsWithdrawn",
+        "type": "event",
+        "signature": "0xb2691cef0b3c06c9e4570d77f68a7f4cf93963f6f92227e4204e6d6c58eede93"
+      },
+      "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "name": "previousOwner",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event",
+        "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+      },
+      "0x79e2abd6df406737d0171e516ef77a0c70533adf169de93b23f768435d47b0e7": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "name": "previousCalculator",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "name": "newCalculator",
+            "type": "address"
+          }
+        ],
+        "name": "SavingsCalculatorChanged",
+        "type": "event",
+        "signature": "0x79e2abd6df406737d0171e516ef77a0c70533adf169de93b23f768435d47b0e7"
+      },
+      "0xa57155e2f39c565fcf934d27dd05e10964451aa1fcaebf581bce5ba514c52eb5": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "name": "previousLoan",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "name": "newLoan",
+            "type": "address"
+          }
+        ],
+        "name": "LoanChanged",
+        "type": "event",
+        "signature": "0xa57155e2f39c565fcf934d27dd05e10964451aa1fcaebf581bce5ba514c52eb5"
+      }
+    },
     "links": {},
     "address": "0x7A0d636AE7945f87bA7Fd643070697EE4081B233",
     "transactionHash": "0x09c3d381611450297928e1950b6de2f05e6974f00e94277d20574595ac61517c"
