@@ -92,12 +92,12 @@ contract InvitationOnlySavings is
         returns (uint256)
     {
         (uint8 dataType, bytes memory extractedData) = _extractData(data);
+        if (dataType == 1) {
+            redeem(extractedData);
+        }
+
         if (!isRedeemed(msg.sender)) {
-            if (dataType == 1) {
-                redeem(extractedData);
-            } else {
-                revert("InvitationOnlySavings: not redeemed user");
-            }
+            revert("InvitationOnlySavings: not redeemed user");
         }
 
         return super.depositWithData(amount, data);
