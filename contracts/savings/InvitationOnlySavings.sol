@@ -92,19 +92,19 @@ contract InvitationOnlySavings is
         returns (uint256)
     {
         if (!isRedeemed(msg.sender)) {
-            (bytes32 promoCode, bytes memory signature) = _extractData(data);
-            redeem(promoCode, signature);
+            redeem(data);
         }
 
         return super.depositWithData(amount, data);
     }
 
-    function redeem(bytes32 promoCode, bytes memory signature)
-        public
-        delegated
-        returns (bool)
-    {
-        (address currentInviter, uint96 nonce) = _extractCode(promoCode);
+    function redeem(bytes memory data) public delegated returns (bool) {
+        (uint8 dataType, bytes memory redeemData) = _extractData(data);
+        require(dataType == 1, "InvitationManager: not redeem data");
+        (bytes32 promoCode, bytes memory signature) = _extractRedeemData(
+            redeemData
+        );
+        (address currentInviter, uint96 nonce) = _extractPromoCode(promoCode);
 
         require(
             _redeemed[msg.sender] != true,
@@ -143,7 +143,7 @@ contract InvitationOnlySavings is
         return true;
     }
 
-    function _extractData(bytes memory data)
+    function _extractRedeemData(bytes memory data)
         internal
         pure
         returns (bytes32, bytes memory)
@@ -165,15 +165,21 @@ contract InvitationOnlySavings is
         return (promoCode, signature);
     }
 
-    function _extractCode(bytes32 promoCode)
+    function _extractPromoCode(bytes32 promoCode)
         internal
         pure
         returns (address, uint96)
     {
         address currentInviter = address(bytes20(promoCode));
         uint96 nonce = uint96(
-            bytes12(bytes32(uint256(promoCode) * uint256(2 ** (160))))
+            bytes12(bytes32(uint256(promoCode) * uint256(2**(160))))
         );
+
+        require(
+            currentInviter != address(0),
+            "InvitationManager: invalid inviter"
+        );
+        require(nonce > 0, "InvitationManager: invalid nonce");
 
         return (currentInviter, nonce);
     }
@@ -205,7 +211,7 @@ contract InvitationOnlySavings is
         pure
         returns (bool)
     {
-        (address currentInviter, ) = _extractCode(promoCode);
+        (address currentInviter, ) = _extractPromoCode(promoCode);
         bytes32 hash = keccak256(abi.encode(promoCode));
         bytes32 hash2 = keccak256(
             abi.encodePacked("\x19Ethereum Signed Message:\n32", hash)

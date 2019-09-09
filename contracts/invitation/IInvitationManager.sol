@@ -24,7 +24,5 @@ interface IInvitationManager {
         returns (address[] memory);
     function redeemerCount(address account) external view returns (uint256);
     function totalRedeemed() external view returns (uint256);
-    function redeem(bytes32 promoCode, bytes calldata signature)
-        external
-        returns (bool);
+    function redeem(bytes calldata data) external returns (bool);
 }

@@ -1,4 +1,4 @@
-const { BN, constants, expectEvent, expectRevert, time } = require("openzeppelin-test-helpers");
+const { BN, constants, expectEvent, expectRevert } = require("openzeppelin-test-helpers");
 const { expect } = require("chai");
 
 const Savings = artifacts.require("mock/savings/MinimumAmountRequiredSavings.sol");
@@ -16,7 +16,7 @@ const AMOUNT_OVER = MULTIPLIER.mul(new BN(150));
 const AMOUNT_UNDER = MULTIPLIER.mul(new BN(99));
 const MINIMUM_SAVINGS_AMOUNT = MULTIPLIER.mul(new BN(100));
 
-contract("MinimumAmountRequiredSavings", function([owner, user1, user2, user3, user4, not_allowed_user, insufficient_user]) {
+contract("MinimumAmountRequiredSavings", function([owner, user1, user2, user3, user4, not_allowed_user]) {
   before(async function() {
     this.dai = await ERC20.new("DAI Stable Token", "DAI", 18);
     this.calculator = await Calculator.new();

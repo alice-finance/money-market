@@ -10,12 +10,9 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
     using SafeMath for uint256;
     IInterestCalculator internal _newSavingsCalculator;
 
-    function savingsCalculatorWithData(bytes memory /* data */)
-        public
-        view
-        delegated
-        returns (IInterestCalculator)
-    {
+    function savingsCalculatorWithData(
+        bytes memory /* data */
+    ) public view delegated returns (IInterestCalculator) {
         return _newSavingsCalculator;
     }
 
@@ -48,12 +45,10 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
         return _withdraw(msg.sender, recordId, amount, data);
     }
 
-    function getSavingsRecordIdsWithData(address user, bytes memory /* data */)
-        public
-        view
-        delegated
-        returns (uint256[] memory)
-    {
+    function getSavingsRecordIdsWithData(
+        address user,
+        bytes memory /* data */
+    ) public view delegated returns (uint256[] memory) {
         return _userSavingsRecordIds[user];
     }
 
@@ -73,12 +68,10 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
         return records;
     }
 
-    function getSavingsRecordWithData(uint256 recordId, bytes memory /* data */)
-        public
-        view
-        delegated
-        returns (SavingsRecord memory)
-    {
+    function getSavingsRecordWithData(
+        uint256 recordId,
+        bytes memory /* data */
+    ) public view delegated returns (SavingsRecord memory) {
         require(recordId < _savingsRecords.length, "invalid recordId");
         SavingsRecord memory record = _savingsRecords[recordId];
 
@@ -88,12 +81,10 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
         return record;
     }
 
-    function getRawSavingsRecordsWithData(address user, bytes memory /* data */)
-        public
-        view
-        delegated
-        returns (SavingsRecord[] memory)
-    {
+    function getRawSavingsRecordsWithData(
+        address user,
+        bytes memory /* data */
+    ) public view delegated returns (SavingsRecord[] memory) {
         uint256[] storage ids = _userSavingsRecordIds[user];
         SavingsRecord[] memory records = new SavingsRecord[](ids.length);
 
@@ -104,31 +95,23 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
         return records;
     }
 
-    function getRawSavingsRecordWithData(uint256 recordId, bytes memory /* data */)
-        public
-        view
-        delegated
-        returns (SavingsRecord memory)
-    {
+    function getRawSavingsRecordWithData(
+        uint256 recordId,
+        bytes memory /* data */
+    ) public view delegated returns (SavingsRecord memory) {
         require(recordId < _savingsRecords.length, "invalid recordId");
         return _savingsRecords[recordId];
     }
 
-    function getCurrentSavingsInterestRateWithData(bytes memory /* data */)
-        public
-        view
-        delegated
-        returns (uint256)
-    {
+    function getCurrentSavingsInterestRateWithData(
+        bytes memory /* data */
+    ) public view delegated returns (uint256) {
         return _calculateSavingsInterestRate(MULTIPLIER);
     }
 
-    function getCurrentSavingsAPRWithData(bytes memory /* data */)
-        public
-        view
-        delegated
-        returns (uint256)
-    {
+    function getCurrentSavingsAPRWithData(
+        bytes memory /* data */
+    ) public view delegated returns (uint256) {
         return
             _newSavingsCalculator.getExpectedBalance(
                     MULTIPLIER,
@@ -145,12 +128,10 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
         return _calculateSavingsInterestRate(amount);
     }
 
-    function getExpectedSavingsAPRWithData(uint256 amount, bytes memory /* data */)
-        public
-        view
-        delegated
-        returns (uint256)
-    {
+    function getExpectedSavingsAPRWithData(
+        uint256 amount,
+        bytes memory /* data */
+    ) public view delegated returns (uint256) {
         return
             _newSavingsCalculator.getExpectedBalance(
                     MULTIPLIER,
@@ -160,11 +141,11 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
                 MULTIPLIER;
     }
 
-    function _deposit(address user, uint256 amount, bytes memory /* data */)
-        internal
-        nonReentrant
-        returns (uint256)
-    {
+    function _deposit(
+        address user,
+        uint256 amount,
+        bytes memory /* data */
+    ) internal nonReentrant returns (uint256) {
         require(amount > 0, "invalid amount");
 
         uint256 recordId = _savingsRecords.length;
@@ -271,5 +252,17 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
                 _totalBorrows,
                 amount
             );
+    }
+
+    function _extractData(bytes memory data)
+        internal
+        pure
+        returns (uint8, bytes memory)
+    {
+        bytes memory resultData = new bytes(data.length - 1);
+        for (uint256 i = 0; i < data.length - 1; i++) {
+            resultData[i] = data[i + 1];
+        }
+        return (uint8(data[0]), resultData);
     }
 }

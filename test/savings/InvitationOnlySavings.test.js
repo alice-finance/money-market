@@ -122,8 +122,9 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
 
         const code = generateCode(inviter1, 1);
         const signature = await generateSignature(generateHash(code), inviter1);
+        const data = "0x01" + code.slice(2) + signature.slice(2);
 
-        const { logs } = await this.market.redeem(code, signature, { from: invitee1 });
+        const { logs } = await this.market.redeem(data, { from: invitee1 });
 
         expectEvent.inLogs(logs, "InvitationCodeUsed", {
           inviter: inviter1,
@@ -143,56 +144,50 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
         it("user already redeemed code", async function() {
           const code = generateCode(inviter1, 1);
           const signature = await generateSignature(generateHash(code), inviter1);
+          const data = "0x01" + code.slice(2) + signature.slice(2);
 
-          await this.market.redeem(code, signature, { from: invitee1 });
+          await this.market.redeem(data, { from: invitee1 });
 
           const code2 = generateCode(inviter1, 2);
           const signature2 = await generateSignature(generateHash(code2), inviter1);
+          const data2 = "0x01" + code2.slice(2) + signature2.slice(2);
 
-          await expectRevert(
-            this.market.redeem(code2, signature2, { from: invitee1 }),
-            "InvitationManager: already redeemed user"
-          );
+          await expectRevert(this.market.redeem(data2, { from: invitee1 }), "InvitationManager: already redeemed user");
         });
 
         it("signature does not match", async function() {
           const code = generateCode(inviter1, 1);
           const code2 = generateCode(inviter1, 2);
           const signature2 = await generateSignature(generateHash(code2), inviter1);
+          const data = "0x01" + code.slice(2) + signature2.slice(2);
 
-          await expectRevert(this.market.redeem(code, signature2, { from: invitee1 }), "InvitationManager: wrong code");
+          await expectRevert(this.market.redeem(data, { from: invitee1 }), "InvitationManager: wrong code");
         });
 
         it("inviter does not deposited enough amount", async function() {
           const code = generateCode(inviter2, 1);
           const signature = await generateSignature(generateHash(code), inviter2);
+          const data = "0x01" + code.slice(2) + signature.slice(2);
 
-          await expectRevert(
-            this.market.redeem(code, signature, { from: invitee1 }),
-            "InvitationManager: max count reached"
-          );
+          await expectRevert(this.market.redeem(data, { from: invitee1 }), "InvitationManager: max count reached");
         });
 
         it("inviter doesn't deposited savings", async function() {
           const code = generateCode(inviter3, 1);
           const signature = await generateSignature(generateHash(code), inviter3);
+          const data = "0x01" + code.slice(2) + signature.slice(2);
 
-          await expectRevert(
-            this.market.redeem(code, signature, { from: invitee1 }),
-            "InvitationManager: max count reached"
-          );
+          await expectRevert(this.market.redeem(data, { from: invitee1 }), "InvitationManager: max count reached");
         });
 
         it("code already used", async function() {
           const code = generateCode(inviter1, 1);
           const signature = await generateSignature(generateHash(code), inviter1);
+          const data = "0x01" + code.slice(2) + signature.slice(2);
 
-          await this.market.redeem(code, signature, { from: invitee1 });
+          await this.market.redeem(data, { from: invitee1 });
 
-          await expectRevert(
-            this.market.redeem(code, signature, { from: invitee2 }),
-            "InvitationManager: code already used"
-          );
+          await expectRevert(this.market.redeem(data, { from: invitee2 }), "InvitationManager: code already used");
         });
       });
     });
@@ -200,7 +195,7 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
       it("should deposit with code data", async function() {
         const code = generateCode(inviter1, 1);
         const signature = await generateSignature(generateHash(code), inviter1);
-        const data = code + signature.slice(2);
+        const data = "0x01" + code.slice(2) + signature.slice(2);
 
         const { logs } = await this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, data, { from: invitee1 });
 
@@ -220,7 +215,7 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
       it("should deposit with any data after redeemed", async function() {
         const code1 = generateCode(inviter1, 1);
         const signature1 = await generateSignature(generateHash(code1), inviter1);
-        const data = code1 + signature1.slice(2);
+        const data = "0x01" + code1.slice(2) + signature1.slice(2);
 
         await this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, data, { from: invitee1 });
 
@@ -228,16 +223,42 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
 
         const code2 = generateCode(inviter1, 2);
         const signature2 = await generateSignature(generateHash(code2), inviter1);
+        const data2 = "0x01" + code2.slice(2) + signature2.slice(2);
 
-        await this.market.redeem(code2, signature2, { from: invitee2 });
+        await this.market.redeem(data2, { from: invitee2 });
 
         await this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, ZERO_BYTES, { from: invitee2 });
       });
 
       it("should fail with invalid code", async function() {
+        const code1 = generateCode(inviter1, 1);
+        const signature1 = await generateSignature(generateHash(code1), inviter1);
+        const data1 = "0x00" + code1.slice(2) + signature1.slice(2);
         await expectRevert(
-          this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, ZERO_BYTES, { from: invitee1 }),
+          this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, data1, { from: invitee1 }),
+          "InvitationManager: not redeem data"
+        );
+
+        const data2 = "0x01" + "00";
+
+        await expectRevert(
+          this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, data2, { from: invitee1 }),
           "InvitationManager: invalid data"
+        );
+
+        const data3 = "0x01" + "0000000000000000000000000000000000000000" + "000000000000000000000000" + "00";
+
+        await expectRevert(
+          this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, data3, { from: invitee1 }),
+          "InvitationManager: invalid inviter"
+        );
+
+        const code4 = generateCode(inviter1, 0);
+        const data4 = "0x01" + code4.slice(2) + "0000000000";
+
+        await expectRevert(
+          this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, data4, { from: invitee1 }),
+          "InvitationManager: invalid nonce"
         );
       });
     });
