@@ -9,7 +9,7 @@ const ZeroCalculator = artifacts.require("calculator/ZeroSavingsInterestCalculat
 
 const { MAX_UINT256 } = constants;
 const ZERO = new BN(0);
-const ZERO_BYTES = [0x00];
+const ZERO_BYTES = [];
 const MULTIPLIER = new BN(10).pow(new BN(18));
 const MAX_AMOUNT = MULTIPLIER.mul(new BN("50000000"));
 const MINIMUM_SAVINGS_AMOUNT = MULTIPLIER.mul(new BN(100));
@@ -122,7 +122,7 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
 
         const code = generateCode(inviter1, 1);
         const signature = await generateSignature(generateHash(code), inviter1);
-        const data = "0x01" + code.slice(2) + signature.slice(2);
+        const data = code + signature.slice(2);
 
         const { logs } = await this.market.redeem(data, { from: invitee1 });
 
@@ -144,13 +144,13 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
         it("user already redeemed code", async function() {
           const code = generateCode(inviter1, 1);
           const signature = await generateSignature(generateHash(code), inviter1);
-          const data = "0x01" + code.slice(2) + signature.slice(2);
+          const data = code + signature.slice(2);
 
           await this.market.redeem(data, { from: invitee1 });
 
           const code2 = generateCode(inviter1, 2);
           const signature2 = await generateSignature(generateHash(code2), inviter1);
-          const data2 = "0x01" + code2.slice(2) + signature2.slice(2);
+          const data2 = code2 + signature2.slice(2);
 
           await expectRevert(this.market.redeem(data2, { from: invitee1 }), "InvitationManager: already redeemed user");
         });
@@ -159,7 +159,7 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
           const code = generateCode(inviter1, 1);
           const code2 = generateCode(inviter1, 2);
           const signature2 = await generateSignature(generateHash(code2), inviter1);
-          const data = "0x01" + code.slice(2) + signature2.slice(2);
+          const data = code + signature2.slice(2);
 
           await expectRevert(this.market.redeem(data, { from: invitee1 }), "InvitationManager: wrong code");
         });
@@ -167,7 +167,7 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
         it("inviter does not deposited enough amount", async function() {
           const code = generateCode(inviter2, 1);
           const signature = await generateSignature(generateHash(code), inviter2);
-          const data = "0x01" + code.slice(2) + signature.slice(2);
+          const data = code + signature.slice(2);
 
           await expectRevert(this.market.redeem(data, { from: invitee1 }), "InvitationManager: max count reached");
         });
@@ -175,7 +175,7 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
         it("inviter doesn't deposited savings", async function() {
           const code = generateCode(inviter3, 1);
           const signature = await generateSignature(generateHash(code), inviter3);
-          const data = "0x01" + code.slice(2) + signature.slice(2);
+          const data = code + signature.slice(2);
 
           await expectRevert(this.market.redeem(data, { from: invitee1 }), "InvitationManager: max count reached");
         });
@@ -183,7 +183,7 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
         it("code already used", async function() {
           const code = generateCode(inviter1, 1);
           const signature = await generateSignature(generateHash(code), inviter1);
-          const data = "0x01" + code.slice(2) + signature.slice(2);
+          const data = code + signature.slice(2);
 
           await this.market.redeem(data, { from: invitee1 });
 
@@ -223,7 +223,7 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
 
         const code2 = generateCode(inviter1, 2);
         const signature2 = await generateSignature(generateHash(code2), inviter1);
-        const data2 = "0x01" + code2.slice(2) + signature2.slice(2);
+        const data2 = code2 + signature2.slice(2);
 
         await this.market.redeem(data2, { from: invitee2 });
 
@@ -236,7 +236,7 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
         const data1 = "0x00" + code1.slice(2) + signature1.slice(2);
         await expectRevert(
           this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, data1, { from: invitee1 }),
-          "InvitationManager: not redeem data"
+          "InvitationOnlySavings: not redeemed user"
         );
 
         const data2 = "0x01" + "00";
@@ -258,6 +258,14 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
 
         await expectRevert(
           this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, data4, { from: invitee1 }),
+          "InvitationManager: invalid nonce"
+        );
+
+        const code5 = generateCode(inviter1, 1);
+        const data5 = "0x01" + code4.slice(2);
+
+        await expectRevert(
+          this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, data5, { from: invitee1 }),
           "InvitationManager: invalid nonce"
         );
       });

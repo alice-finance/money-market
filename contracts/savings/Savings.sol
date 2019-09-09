@@ -259,10 +259,11 @@ contract Savings is Fund, SavingsData, ReentrancyGuard {
         pure
         returns (uint8, bytes memory)
     {
-        bytes memory resultData = new bytes(data.length - 1);
-        for (uint256 i = 0; i < data.length - 1; i++) {
-            resultData[i] = data[i + 1];
+        uint8 dataType = data.length > 0 ? uint8(data[0]) : 0;
+        bytes memory resultData = new bytes(data.length);
+        for (uint256 i = 1; i < data.length; i++) {
+            resultData[i - 1] = data[i];
         }
-        return (uint8(data[0]), resultData);
+        return (dataType, resultData);
     }
 }

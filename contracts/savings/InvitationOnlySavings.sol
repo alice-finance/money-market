@@ -91,16 +91,19 @@ contract InvitationOnlySavings is
         delegated
         returns (uint256)
     {
+        (uint8 dataType, bytes memory extractedData) = _extractData(data);
         if (!isRedeemed(msg.sender)) {
-            redeem(data);
+            if (dataType == 1) {
+                redeem(extractedData);
+            } else {
+                revert("InvitationOnlySavings: not redeemed user");
+            }
         }
 
         return super.depositWithData(amount, data);
     }
 
-    function redeem(bytes memory data) public delegated returns (bool) {
-        (uint8 dataType, bytes memory redeemData) = _extractData(data);
-        require(dataType == 1, "InvitationManager: not redeem data");
+    function redeem(bytes memory redeemData) public delegated returns (bool) {
         (bytes32 promoCode, bytes memory signature) = _extractRedeemData(
             redeemData
         );
