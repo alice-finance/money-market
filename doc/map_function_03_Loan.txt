@@ -1,0 +1,35 @@
+Base
+    function owner() public view returns (address);
+    modifier onlyOwner();
+    function isOwner() public view returns (bool);
+    function transferOwnership(address newOwner) public onlyOwner;
+    modifier nonReentrant();
+    function asset() public view returns (IERC20);
+    function loan() public view returns (address);
+    function setLoan(address newLoanAddress) public onlyOwner;
+    function savingsCalculator() public view returns (IInterestCalculator);
+    function setSavingsCalculator(IInterestCalculator calculator) public onlyOwner;
+    function totalFunds() public view returns (uint256);
+    function totalBorrows() public view returns (uint256);
+DelegatedBase
+    modifier delegated();
+    modifier initialized();
+    function version();
+    modifier checkVersion(uint256 minimumVersion);
+ISavings
+DelegatedSavingsBase
+    function delegatedSavingsCalculator() public view delegated initialized returns (IInterestCalculator);
+    function setDelegatedSavingsCalculator(IInterestCalculator calculator) public delegated initialized onlyOwner;
+    function minimumSavingsAmount() public view delegated initialized returns (uint256);
+    function setMinimumSavingsAmount(uint256 amount) public delegated initialized onlyOwner;
+IInvitationManager
+InvitationOnlySavings
+    uint256 private _amountOfSavingsPerInvite;
+    mapping(address => address) private _inviter;
+    mapping(address => bool) private _redeemed;
+    mapping(address => address[]) private _redeemers;
+    mapping(address => mapping(uint96 => bool)) private _nonceUsage;
+    address[] private _inviterList;
+    uint256 private _totalRedeemed;
+loan/Loan
+loan/StakingBasedLoan

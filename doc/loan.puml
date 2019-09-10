@@ -1,0 +1,82 @@
+@startuml
+interface IInterestCalculator {
++ getInterestRate()
++ getExpectedBalance()
+}
+
+interface ILoanInterestCalculator {
++ getCollateralInterestRate()
+}
+
+class LoanInterestCalculatorV1 {
+}
+
+interface ILoan {
++ borrow()
++ repay()
++ supplyCollateral()
+}
+
+
+class Loan {
++ getCurrentPrice(asset)
++ getPriceAt(asset, timestamp)
++ reportPrice(asset, timestamp)
++ validatePrice()
+~ liquidate()
++ applyForLiquidation()
+}
+
+class OperatorPortal {
+- struct Asset {address, stakedAmount}
+- struct Operator {assetAddress, stakedAmount }
+
+owner: DeferredOwner
+
++ assets(): Asset[]
++ asset(address): Asset
++ totalStakedAmount(): uint256
++ assetsOf(operator): Asset[]
++ operatorsOf(asset): Operator[]
+
++ stake(asset, amount)
++ unstake(asset, amount)
++ pendingBalanceOf()
++ withdraw()
+
++ delegator()
++ isDelegator()
++ addDelegator() onlyOwner
++ removeDelegator() onlyOwner
++ slash() onlyDelegator
+}
+
+interface IERC20AssetRegistry {
++ assets(): address[]
++ isRegistered(address): bool
+}
+
+class ERC20AssetRegistry {
++ register(address) onlyOperator
++ unregister(address) - check stakedAmount
+}
+
+class Exchange {
++ getCurrentPrice()
+}
+
+Loan *-right- OperatorPortal
+Loan *-- Exchange
+Loan *- IERC20AssetRegistry
+
+ILoan <|-right- Loan
+IInterestCalculator <|-right- ILoanInterestCalculator
+ILoanInterestCalculator <|-right- LoanInterestCalculatorV1
+Loan *-up- ILoanInterestCalculator
+
+
+IERC20AssetRegistry <|-right- ERC20AssetRegistry
+ERC20AssetRegistry *-down- OperatorPortal
+
+
+@enduml
