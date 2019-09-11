@@ -212,7 +212,7 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
         });
       });
 
-      it.only("should deposit if user already deposited before upgrade", async function() {
+      it("should deposit if user already deposited before upgrade", async function() {
         const { logs } = await this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, ZERO_BYTES, { from: inviter1 });
 
         expectEvent.inLogs(logs, "SavingsDeposited", {
