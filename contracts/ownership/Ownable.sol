@@ -1,9 +1,7 @@
 pragma solidity 0.5.8;
 pragma experimental ABIEncoderV2;
 
-import "./base/Constants.sol";
-
-contract Ownable is Constants {
+contract Ownable {
     address private _owner;
 
     event OwnershipTransferred(

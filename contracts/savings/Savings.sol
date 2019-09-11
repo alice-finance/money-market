@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 import "../base/Fund.sol";
 import "./SavingsData.sol";
-import "../ReentrancyGuard.sol";
+import "../utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract Savings is Fund, SavingsData, ReentrancyGuard {
