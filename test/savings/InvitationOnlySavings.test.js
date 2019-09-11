@@ -212,6 +212,16 @@ contract("InvitationOnlySavings", function([admin, notAdmin, inviter1, inviter2,
         });
       });
 
+      it.only("should deposit if user already deposited before upgrade", async function() {
+        const { logs } = await this.market.depositWithData(MINIMUM_SAVINGS_AMOUNT, ZERO_BYTES, { from: inviter1 });
+
+        expectEvent.inLogs(logs, "SavingsDeposited", {
+          recordId: new BN(2),
+          owner: inviter1,
+          balance: MINIMUM_SAVINGS_AMOUNT
+        });
+      });
+
       it("should deposit with any data after redeemed", async function() {
         const code1 = generateCode(inviter1, 1);
         const signature1 = await generateSignature(generateHash(code1), inviter1);

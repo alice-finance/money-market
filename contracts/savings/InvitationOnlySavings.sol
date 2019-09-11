@@ -97,7 +97,9 @@ contract InvitationOnlySavings is
         }
 
         if (!isRedeemed(msg.sender)) {
-            revert("InvitationOnlySavings: not redeemed user");
+            if (_userSavingsRecordIds[msg.sender].length == 0) {
+                revert("InvitationOnlySavings: not redeemed user");
+            }
         }
 
         return super.depositWithData(amount, data);
