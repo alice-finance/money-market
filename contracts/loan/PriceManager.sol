@@ -2,7 +2,7 @@ pragma solidity 0.5.8;
 pragma experimental ABIEncoderV2;
 
 contract PriceManager {
-    uint8 constant PRICE_FEED_INTERVAL = 10 minutes;
+    uint256 constant PRICE_FEED_INTERVAL = 10 minutes;
 
     struct PriceData {
         address asset;
