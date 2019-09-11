@@ -12,10 +12,12 @@ This repository contains Solidity contracts for Alice Finance.
 
 All contracts are deployed on Loom Network's [PlasmaChain](https://loomx.io/developers/en/intro-to-loom.html#what-is-plasmachain).
 
-| Contract                    | Address                                                      |
-| --------------------------- | ------------------------------------------------------------ |
-| MoneyMarket                 | [`0x1Fe7A4F1F8b8528c4cf55990f78cB38d203ADE73`](https://loom-blockexplorer.dappchains.com/address/0x1fe7a4f1f8b8528c4cf55990f78cb38d203ade73/transactions) |
-| SavingsInterestCalculatorV1 | [`0xBfe5fc58c3F12A5dd750a5D686DC1Ae8095c279B`](https://loom-blockexplorer.dappchains.com/address/0xbfe5fc58c3f12a5dd750a5d686dc1ae8095c279b/transactions) |
+| Contract                      | Address                                                      |
+| ----------------------------- | ------------------------------------------------------------ |
+| MoneyMarket                   | [`0x1Fe7A4F1F8b8528c4cf55990f78cB38d203ADE73`](https://loom-blockexplorer.dappchains.com/address/0x1fe7a4f1f8b8528c4cf55990f78cb38d203ade73/transactions) |
+| SavingsInterestCalculatorV1   | [`0xBfe5fc58c3F12A5dd750a5D686DC1Ae8095c279B`](https://loom-blockexplorer.dappchains.com/address/0xbfe5fc58c3f12a5dd750a5d686dc1ae8095c279b/transactions) |
+| InvitationOnlySavings         | [`0x3D21c813B601245cA5CF4E443bAd75627f3e45c3`](https://loom-blockexplorer.dappchains.com/address/0x3d21c813b601245ca5cf4e443bad75627f3e45c3/transactions) |
+| ZeroSavingsInterestCalculator | [`0x60609A86Adfd790DA384c420C97f8d798e99ca4b`](https://loom-blockexplorer.dappchains.com/address/0x60609a86adfd790da384c420c97f8d798e99ca4b/transactions) |
 
 And these are addresses of the assets we are using in Money Market
 
