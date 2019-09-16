@@ -37,6 +37,12 @@ interface ILoan {
         uint256 timestamp
     );
 
+    event LoanClosed(
+        uint256 recordId,
+        address indexed owner,
+        uint256 timestamp
+    );
+
     struct LoanRecord {
         uint256 id;
         address owner;
@@ -45,6 +51,7 @@ interface ILoan {
         uint256 principal;
         address collateral;
         uint256 collateralAmount;
+        uint256 collateralRate;
         uint256 initialTimestamp;
         uint256 lastTimestamp;
     }
@@ -52,15 +59,21 @@ interface ILoan {
     function borrow(
         uint256 amount,
         address collateral,
-        uint256 collateralAmount
+        uint256 collateralAmount,
+        bytes calldata data
     ) external returns (uint256);
-    function repay(uint256 recordId, uint256 amount) external returns (bool);
-    function supplyCollateral(uint256 recordId, uint256 amount)
+    function repay(uint256 recordId, uint256 amount, bytes calldata data)
         external
         returns (bool);
+    function supplyCollateral(
+        uint256 recordId,
+        uint256 amount,
+        bytes calldata data
+    ) external returns (bool);
     function liquidate(
         uint256 recordId,
         uint256 amount,
-        uint256 collateralAmount
+        uint256 collateralAmount,
+        bytes calldata data
     ) external returns (bool);
 }

@@ -1,7 +1,9 @@
 pragma solidity 0.5.8;
 pragma experimental ABIEncoderV2;
 
-contract PriceManager {
+import "./LoanData.sol";
+
+contract PriceManager is LoanData {
     uint256 constant PRICE_FEED_INTERVAL = 10 minutes;
 
     struct PriceData {
@@ -20,12 +22,19 @@ contract PriceManager {
     // operator => timeSlot
     mapping(address => uint256) private _lastReportedSlot;
 
-    function getCurrentPrice(address asset) public returns (uint256) {
+    function getCurrentPrice(address asset)
+        public
+        view
+        delegated
+        returns (uint256)
+    {
         return _getPriceAtSlot(asset, _timestampToSlot(block.timestamp));
     }
 
     function getPriceAt(address asset, uint256 timestamp)
         public
+        view
+        delegated
         returns (uint256)
     {
         return _getPriceAtSlot(asset, _timestampToSlot(timestamp));
@@ -33,6 +42,7 @@ contract PriceManager {
 
     function reportPrice(address asset, uint256 price, uint256 timestamp)
         public
+        delegated
         returns (bool)
     {
         uint256 slot = _timestampToSlot(timestamp);
@@ -53,7 +63,7 @@ contract PriceManager {
         return false;
     }
 
-    function validatePrice() public returns (bool) {
+    function _validatePrice() public delegated returns (bool) {
         // Collect price data into price _price feed
 
         // penalize operators who did not reported price data
