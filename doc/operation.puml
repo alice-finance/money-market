@@ -1,0 +1,74 @@
+@startuml
+
+class OperatorPortal {
+    ~ delegators: address[]
+    .. only owner ..
+    + addDelegator(address): bool
+    + removeDelegator(address): bool
+    .. only delegator ..
+    + slash(address, uint256): bool
+    + batchSlash(address[], uint256[]): bool
+    .. public ..
+}
+
+interface IExchangePriceSource {
+    + getPrice(address, address, uint256): Price {abstract}
+}
+
+interface IPriceSource {
+    + getPrice(address, uint256): uint256 {abstract}
+    + getLastPrice(address): uint256 {abstract}
+}
+
+IPriceSource <.down. MoneyMarket: use
+
+class OperatorPriceSource {
+    ~ portal: OperatorPortal
+    ~ exchange: IExchangePriceSource
+    .. only operator ..
+    + postPrice(address, uint256, uint256): bool
+    .. public ..
+}
+
+OperatorPriceSource -up-|> IPriceSource
+OperatorPriceSource .left.> OperatorPortal : delegator
+OperatorPriceSource ..> IExchangePriceSource : use
+
+interface IAssetRegistry {
+    + assets(): address[] {abstract}
+    + isRegistered(address): bool {abstract}
+}
+
+IAssetRegistry <.down. MoneyMarket: use
+
+class OperatorAssetRegistry {
+    ~ portal: OperatorPortal
+    .. only operator ..
+    + register(address): bool
+    + unregister(address): bool
+    .. public ..
+}
+
+OperatorAssetRegistry -up-|> IAssetRegistry
+OperatorAssetRegistry .> OperatorPortal: delegator
+
+class LiquidationDelegator {
+    ~ portal: OperatorPortal
+    + moneyMarket: MoneyMarket
+    .. only operator ..
+    + liquidate(): bool
+    .. public ..
+}
+
+LiquidationDelegator .down.> OperatorPortal: delegator
+
+class MoneyMarket {
+    ~ liquidator: address
+    .. only liquidator ..
+    + liquidate(address, address, uint256): bool
+    .. public ..
+}
+
+LiquidationDelegator .up.> MoneyMarket: liquidator
+
+@enduml

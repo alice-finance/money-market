@@ -1,4 +1,4 @@
-pragma solidity 0.5.8;
+pragma solidity ^0.5.8;
 pragma experimental ABIEncoderV2;
 
 /**
@@ -129,7 +129,9 @@ interface IERC20 {
      *
      * Emits a `Transfer` event.
      */
-    function transfer(address recipient, uint256 amount) external returns (bool);
+    function transfer(address recipient, uint256 amount)
+        external
+        returns (bool);
 
     /**
      * @dev Returns the remaining number of tokens that `spender` will be
@@ -138,7 +140,10 @@ interface IERC20 {
      *
      * This value changes when `approve` or `transferFrom` are called.
      */
-    function allowance(address owner, address spender) external view returns (uint256);
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
 
     /**
      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
@@ -165,7 +170,9 @@ interface IERC20 {
      *
      * Emits a `Transfer` event.
      */
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount)
+        external
+        returns (bool);
 
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
@@ -179,7 +186,11 @@ interface IERC20 {
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
      * a call to `approve`. `value` is the new allowance.
      */
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
 }
 
 interface IInterestCalculator {
@@ -198,7 +209,7 @@ interface IInterestCalculator {
 
 contract Base {
     uint256 public constant DECIMALS = 18;
-    uint256 public constant MULTIPLIER = 10 ** DECIMALS;
+    uint256 public constant MULTIPLIER = 10**DECIMALS;
 
     address internal _owner;
     IERC20 internal _asset;
@@ -290,8 +301,8 @@ contract Base {
     }
 
     function setSavingsCalculator(IInterestCalculator calculator)
-    public
-    onlyOwner
+        public
+        onlyOwner
     {
         require(address(calculator) != address(0), "ZERO address");
 
@@ -310,7 +321,6 @@ contract Base {
         return _totalBorrows;
     }
 }
-
 
 contract FallbackDispatcher is Base {
     function() external payable {
@@ -332,16 +342,15 @@ contract FallbackDispatcher is Base {
             returndatacopy(0, 0, returndatasize)
 
             switch result
-            case 0 {
-                revert(0, returndatasize)
-            }
-            default {
-                return (0, returndatasize)
-            }
+                case 0 {
+                    revert(0, returndatasize)
+                }
+                default {
+                    return(0, returndatasize)
+                }
         }
     }
 }
-
 
 contract SavingsBase is FallbackDispatcher {
     using SafeMath for uint256;
@@ -367,9 +376,9 @@ contract SavingsBase is FallbackDispatcher {
 
     /** Internal functions */
     function _deposit(address user, uint256 amount)
-    internal
-    nonReentrant
-    returns (uint256)
+        internal
+        nonReentrant
+        returns (uint256)
     {
         require(amount > 0, "invalid amount");
 
@@ -413,9 +422,9 @@ contract SavingsBase is FallbackDispatcher {
     }
 
     function _withdraw(address user, uint256 recordId, uint256 amount)
-    internal
-    nonReentrant
-    returns (bool)
+        internal
+        nonReentrant
+        returns (bool)
     {
         require(recordId < _savingsRecords.length, "invalid recordId");
 
@@ -453,32 +462,31 @@ contract SavingsBase is FallbackDispatcher {
     }
 
     function _getCurrentSavingsBalance(SavingsRecord memory record)
-    internal
-    view
-    returns (uint256)
+        internal
+        view
+        returns (uint256)
     {
         return
-        _savingsInterestCalculator.getExpectedBalance(
-            record.balance,
-            record.interestRate,
-            block.timestamp - record.lastTimestamp
-        );
+            _savingsInterestCalculator.getExpectedBalance(
+                record.balance,
+                record.interestRate,
+                block.timestamp - record.lastTimestamp
+            );
     }
 
     function _calculateSavingsInterestRate(uint256 amount)
-    internal
-    view
-    returns (uint256)
+        internal
+        view
+        returns (uint256)
     {
         return
-        _savingsInterestCalculator.getInterestRate(
-            _totalFunds,
-            _totalBorrows,
-            amount
-        );
+            _savingsInterestCalculator.getInterestRate(
+                _totalFunds,
+                _totalBorrows,
+                amount
+            );
     }
 }
-
 
 contract Savings is SavingsBase {
     function deposit(uint256 amount) public returns (uint256) {
@@ -490,22 +498,22 @@ contract Savings is SavingsBase {
     }
 
     function getSavingsRecordIds(address user)
-    public
-    view
-    returns (uint256[] memory)
+        public
+        view
+        returns (uint256[] memory)
     {
         return _userSavingsRecordIds[user];
     }
 
     function getSavingsRecords(address user)
-    public
-    view
-    returns (SavingsRecord[] memory)
+        public
+        view
+        returns (SavingsRecord[] memory)
     {
         uint256[] storage ids = _userSavingsRecordIds[user];
         SavingsRecord[] memory records = new SavingsRecord[](ids.length);
 
-        for (uint i = 0; i < ids.length; i++) {
+        for (uint256 i = 0; i < ids.length; i++) {
             records[i] = getSavingsRecord(ids[i]);
         }
 
@@ -513,9 +521,9 @@ contract Savings is SavingsBase {
     }
 
     function getSavingsRecord(uint256 recordId)
-    public
-    view
-    returns (SavingsRecord memory)
+        public
+        view
+        returns (SavingsRecord memory)
     {
         require(recordId < _savingsRecords.length, "invalid recordId");
         SavingsRecord memory record = _savingsRecords[recordId];
@@ -527,14 +535,14 @@ contract Savings is SavingsBase {
     }
 
     function getRawSavingsRecords(address user)
-    public
-    view
-    returns (SavingsRecord[] memory)
+        public
+        view
+        returns (SavingsRecord[] memory)
     {
         uint256[] storage ids = _userSavingsRecordIds[user];
         SavingsRecord[] memory records = new SavingsRecord[](ids.length);
 
-        for (uint i = 0; i < ids.length; i++) {
+        for (uint256 i = 0; i < ids.length; i++) {
             records[i] = _savingsRecords[ids[i]];
         }
 
@@ -542,62 +550,57 @@ contract Savings is SavingsBase {
     }
 
     function getRawSavingsRecord(uint256 recordId)
-    public
-    view
-    returns (SavingsRecord memory)
+        public
+        view
+        returns (SavingsRecord memory)
     {
         require(recordId < _savingsRecords.length, "invalid recordId");
         return _savingsRecords[recordId];
     }
 
-    function getCurrentSavingsInterestRate()
-    public
-    view
-    returns (uint256)
-    {
+    function getCurrentSavingsInterestRate() public view returns (uint256) {
         return _calculateSavingsInterestRate(MULTIPLIER);
     }
 
-    function getCurrentSavingsAPR()
-    public
-    view
-    returns (uint256)
-    {
-        return _savingsInterestCalculator.getExpectedBalance(
-            MULTIPLIER,
-            _calculateSavingsInterestRate(MULTIPLIER),
-            365 days
-        ) - MULTIPLIER;
+    function getCurrentSavingsAPR() public view returns (uint256) {
+        return
+            _savingsInterestCalculator.getExpectedBalance(
+                    MULTIPLIER,
+                    _calculateSavingsInterestRate(MULTIPLIER),
+                    365 days
+                ) -
+                MULTIPLIER;
     }
 
     function getExpectedSavingsInterestRate(uint256 amount)
-    public
-    view
-    returns (uint256)
+        public
+        view
+        returns (uint256)
     {
-        return _calculateSavingsInterestRate(
-            amount
-        );
+        return _calculateSavingsInterestRate(amount);
     }
 
     function getExpectedSavingsAPR(uint256 amount)
-    public
-    view
-    returns (uint256)
+        public
+        view
+        returns (uint256)
     {
-        return _savingsInterestCalculator.getExpectedBalance(
-            MULTIPLIER,
-            _calculateSavingsInterestRate(amount),
-            365 days
-        ) - MULTIPLIER;
+        return
+            _savingsInterestCalculator.getExpectedBalance(
+                    MULTIPLIER,
+                    _calculateSavingsInterestRate(amount),
+                    365 days
+                ) -
+                MULTIPLIER;
     }
 }
 
-
 contract MoneyMarket is Savings {
-    constructor(address ownerAddress, address assetAddress, address savingsInterestCalculatorAddress)
-        public
-    {
+    constructor(
+        address ownerAddress,
+        address assetAddress,
+        address savingsInterestCalculatorAddress
+    ) public {
         _owner = ownerAddress;
         _asset = IERC20(assetAddress);
         _savingsInterestCalculator = IInterestCalculator(

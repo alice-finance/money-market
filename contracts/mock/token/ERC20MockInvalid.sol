@@ -1,4 +1,4 @@
-pragma solidity 0.5.8;
+pragma solidity ^0.5.11;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
@@ -6,17 +6,21 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/access/roles/MinterRole.sol";
 
 interface BadERC20Basic {
-    function balanceOf(address who) external view returns (uint);
-    function transfer(address to, uint value) external;
+    function balanceOf(address who) external view returns (uint256);
+    function transfer(address to, uint256 value) external;
     function allowance(address owner, address spender)
         external
         view
-        returns (uint);
-    function transferFrom(address from, address to, uint value) external;
-    function approve(address spender, uint value) external;
+        returns (uint256);
+    function transferFrom(address from, address to, uint256 value) external;
+    function approve(address spender, uint256 value) external;
 
-    event Approval(address indexed owner, address indexed spender, uint value);
-    event Transfer(address indexed from, address indexed to, uint value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
+    event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
 contract ERC20MockInvalid is BadERC20Basic, MinterRole {

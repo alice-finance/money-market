@@ -1,4 +1,4 @@
-pragma solidity 0.5.8;
+pragma solidity ^0.5.11;
 
 contract ReentrancyGuard {
     uint256 internal _guardCounter;

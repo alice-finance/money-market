@@ -1,4 +1,4 @@
-pragma solidity 0.5.8;
+pragma solidity ^0.5.11;
 pragma experimental ABIEncoderV2;
 
 import "../Ownable.sol";
@@ -99,18 +99,18 @@ contract OperatorPortal is Ownable {
     }
 
     function assetsOf(address operator) public view returns (Asset[] memory) {
-        Asset[] memory assets = new Asset[](_assetsOf[operator].length);
+        Asset[] memory assetList = new Asset[](_assetsOf[operator].length);
 
         for (uint256 i = 0; i < _assetsOf[operator].length; i++) {
             address asset = _assetsOf[operator][i];
-            assets[i] = Asset(
+            assetList[i] = Asset(
                 asset,
                 _operatorAssetStakedAmount[operator][asset],
                 _assetStakedAmount[asset]
             );
         }
 
-        return assets;
+        return assetList;
     }
 
     function operatorsOf(address assetAddress)
@@ -118,20 +118,34 @@ contract OperatorPortal is Ownable {
         view
         returns (Operator[] memory)
     {
-        Operator[] memory operators = new Operator[](
+        Operator[] memory operatorList = new Operator[](
             _operatorsOf[assetAddress].length
         );
 
         for (uint256 i = 0; i < _operatorsOf[assetAddress].length; i++) {
             address operator = _operatorsOf[assetAddress][i];
-            operators[i] = Operator(
+            operatorList[i] = Operator(
                 operator,
                 _operatorAssetStakedAmount[operator][assetAddress],
                 _operatorStakedAmount[operator]
             );
         }
 
-        return operators;
+        return operatorList;
+    }
+
+    function isOperator(address account, address assetAddress)
+        public
+        view
+        returns (bool)
+    {
+        for (uint256 i = 0; i < _operatorsOf[assetAddress].length; i++) {
+            if (account == _operatorsOf[assetAddress][i]) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     function stake(address assetAddress, uint256 amount) public returns (bool) {
