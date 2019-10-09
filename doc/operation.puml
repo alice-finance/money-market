@@ -2,13 +2,14 @@
 
 class OperatorPortal {
     ~ delegators: address[]
-    .. only owner ..
-    + addDelegator(address): bool
-    + removeDelegator(address): bool
-    .. only delegator ..
-    + slash(address, uint256): bool
-    + batchSlash(address[], uint256[]): bool
-    .. public ..
+    --
+    <<modifier>> onlyOwner
+    <<modifier>> onlyDelegator
+    ..
+    + addDelegator(address) onlyOwner: bool
+    + removeDelegator(address) onlyOwner: bool
+    + slash(address, uint256) onlyDelegator: bool
+    + batchSlash(address[], uint256[]) onlyDelegator: bool
 }
 
 interface IExchangePriceSource {
@@ -25,9 +26,10 @@ IPriceSource <.down. MoneyMarket: use
 class OperatorPriceSource {
     ~ portal: OperatorPortal
     ~ exchange: IExchangePriceSource
-    .. only operator ..
-    + postPrice(address, uint256, uint256): bool
-    .. public ..
+    --
+    <<modifier>> onlyOperator
+    ..
+    + postPrice(address, uint256, uint256) onlyOperator: bool
 }
 
 OperatorPriceSource -up-|> IPriceSource
@@ -43,10 +45,11 @@ IAssetRegistry <.down. MoneyMarket: use
 
 class OperatorAssetRegistry {
     ~ portal: OperatorPortal
-    .. only operator ..
-    + register(address): bool
-    + unregister(address): bool
-    .. public ..
+    --
+    <<modifier>> onlyOperator
+    ..
+    + register(address) onlyOperator: bool
+    + unregister(address) onlyOperator: bool
 }
 
 OperatorAssetRegistry -up-|> IAssetRegistry
@@ -55,18 +58,20 @@ OperatorAssetRegistry .> OperatorPortal: delegator
 class LiquidationDelegator {
     ~ portal: OperatorPortal
     + moneyMarket: MoneyMarket
-    .. only operator ..
-    + liquidate(): bool
-    .. public ..
+    --
+    <<modifier>> onlyOperator
+    ..
+    + liquidate() onlyOperator: bool
 }
 
 LiquidationDelegator .down.> OperatorPortal: delegator
 
 class MoneyMarket {
     ~ liquidator: address
-    .. only liquidator ..
-    + liquidate(address, address, uint256): bool
-    .. public ..
+    --
+    <<modifier>> onlyLiquidator
+    ..
+    + liquidate(address, address, uint256) onlyLiquidator: bool
 }
 
 LiquidationDelegator .up.> MoneyMarket: liquidator
