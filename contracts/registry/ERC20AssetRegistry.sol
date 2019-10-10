@@ -2,9 +2,10 @@ pragma solidity ^0.5.11;
 pragma experimental ABIEncoderV2;
 
 import "./IERC20AssetRegistry.sol";
-import "../staking/OperatorPortal.sol";
+import "../operator/IDelegator.sol";
+import "../operator/OperatorPortal.sol";
 
-contract ERC20AssetRegistry is IERC20AssetRegistry {
+contract ERC20AssetRegistry is IERC20AssetRegistry, IDelegator {
     OperatorPortal private _portal;
     mapping(address => bool) private _registered;
     address[] private _assets;
@@ -22,6 +23,10 @@ contract ERC20AssetRegistry is IERC20AssetRegistry {
 
     constructor(address portalAddress) public {
         _portal = OperatorPortal(portalAddress);
+    }
+
+    function isDelegator() external view returns (bool) {
+        return true;
     }
 
     function assets() public view returns (address[] memory) {
@@ -44,8 +49,11 @@ contract ERC20AssetRegistry is IERC20AssetRegistry {
 
         return false;
     }
+
     function unregister(address asset) public returns (bool) {
         require(_registered[asset], "asset is not registered");
+        require(_isUnregisterable(asset), "asset cannot be unregistered");
+
         uint256 id = uint256(-1);
 
         for (uint256 i = 0; i < _assets.length; i++) {
@@ -63,6 +71,21 @@ contract ERC20AssetRegistry is IERC20AssetRegistry {
 
         emit AssetUnregistered(asset, msg.sender, block.timestamp);
 
+        return true;
+    }
+
+    function _isUnregisterable(address asset) internal view returns (bool) {
+        OperatorPortal.AssetInfo memory assetInfo = _portal.getAssetInfo(asset);
+        return assetInfo.numOperator > 0;
+    }
+
+    function isStakeRemovable(address asset, address operator)
+        public
+        view
+        returns (bool)
+    {
+        asset;
+        operator;
         return true;
     }
 }

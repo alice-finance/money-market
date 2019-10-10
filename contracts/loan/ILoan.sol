@@ -1,4 +1,5 @@
 pragma solidity ^0.5.11;
+pragma experimental ABIEncoderV2;
 
 interface ILoan {
     event LoanBorrowed(
@@ -76,4 +77,18 @@ interface ILoan {
         uint256 collateralAmount,
         bytes calldata data
     ) external returns (bool);
+    function getActiveLoanRecordsWithData(bytes calldata data)
+        external
+        view
+        returns (LoanRecord[] memory);
+    function totalBorrowByCollateral(address collateral)
+        external
+        view
+        returns (uint256);
+    function getActiveLoanRecordsByCollateralWithData(
+        address collateral,
+        uint256 minCollateralRate,
+        uint256 maxCollateralRate,
+        bytes calldata data
+    ) external view returns (LoanRecord[] memory);
 }

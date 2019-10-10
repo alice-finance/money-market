@@ -5,7 +5,7 @@ import "../savings/InvitationOnlySavings.sol";
 import "./ILoan.sol";
 import "../registry/IERC20AssetRegistry.sol";
 import "../calculator/ILoanInterestCalculator.sol";
-import "../staking/OperatorPortal.sol";
+import "../operator/OperatorPortal.sol";
 
 contract LoanData is InvitationOnlySavings, ILoan {
     OperatorPortal internal _operatorPortal;
