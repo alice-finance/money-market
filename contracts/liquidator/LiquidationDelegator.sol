@@ -177,7 +177,7 @@ contract LiquidationDelegator is IDelegator, Constants, Timeslot, Ownable {
                         .getAllOperatorInfo(asset);
 
                     for (uint256 i = 0; i < loans.length; i++) {
-                        _liquidate(loans[i], assetInfo, operatorInfo);
+                        _liquidate(loans[i], assetInfo, operatorInfo, price);
                     }
                 }
 
@@ -198,10 +198,12 @@ contract LiquidationDelegator is IDelegator, Constants, Timeslot, Ownable {
     function _liquidate(
         ILoan.LoanRecord memory targetLoan,
         OperatorPortal.AssetInfo memory assetInfo,
-        OperatorPortal.OperatorInfo[] memory operatorInfo
+        OperatorPortal.OperatorInfo[] memory operatorInfo,
+        uint256 price
     ) internal {
         // Pre-calculate
         LiquidateParams memory params = LiquidateParams(0, 0, 0, 0);
+        params.loanValue = (targetLoan.collateralAmount * price) / MULTIPLIER;
         uint256[] memory participatorIds = new uint256[](assetInfo.numOperator);
         params.participatorLength = 0;
         params.participatorStake = assetInfo.totalStakedAmount;
@@ -212,7 +214,7 @@ contract LiquidationDelegator is IDelegator, Constants, Timeslot, Ownable {
         for (uint256 i = 0; i < assetInfo.numOperator; i++) {
             OperatorPortal.OperatorInfo memory info = operatorInfo[i];
 
-            uint256 amount = (targetLoan.balance * info.stakedAmount) /
+            uint256 amount = (params.loanValue * info.stakedAmount) /
                 params.participatorStake;
 
             if (
@@ -234,7 +236,7 @@ contract LiquidationDelegator is IDelegator, Constants, Timeslot, Ownable {
             uint256 balance = 0;
             for (uint256 i = 0; i < params.participatorLength; i++) {
                 OperatorPortal.OperatorInfo memory info = operatorInfo[participatorIds[i]];
-                uint256 baseAssetAmount = (targetLoan.balance *
+                uint256 baseAssetAmount = (params.loanValue *
                         info.stakedAmount) /
                     params.participatorStake;
                 balance += baseAssetAmount;
@@ -271,7 +273,7 @@ contract LiquidationDelegator is IDelegator, Constants, Timeslot, Ownable {
                 OperatorPortal.OperatorInfo memory info = operatorInfo[penaltyIds[i]];
 
                 uint256 penalty = (info.stakedAmount *
-                        targetLoan.balance *
+                        params.loanValue *
                         MULTIPLIER) /
                     assetInfo.totalStakedAmount /
                     params.totalBorrows;
