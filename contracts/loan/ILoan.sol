@@ -7,7 +7,7 @@ interface ILoan {
         address indexed owner,
         uint256 balance,
         uint256 rate,
-        address collateral,
+        address indexed collateral,
         uint256 collateralAmount,
         uint256 timestamp
     );
@@ -24,7 +24,7 @@ interface ILoan {
         uint256 recordId,
         address indexed owner,
         uint256 amount,
-        address collateral,
+        address indexed collateral,
         uint256 collateralAmount,
         uint256 timestamp
     );
@@ -32,8 +32,10 @@ interface ILoan {
     event LoanLiquidated(
         uint256 recordId,
         address indexed owner,
+        address indexed liquidator,
         uint256 amount,
-        address collateral,
+        uint256 balance,
+        address indexed collateral,
         uint256 collateralAmount,
         uint256 timestamp
     );

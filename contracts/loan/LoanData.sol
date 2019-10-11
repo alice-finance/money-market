@@ -21,6 +21,7 @@ contract LoanData is InvitationOnlySavings, ILoan {
     LoanRecord[] internal _loanRecords;
     mapping(address => uint256[]) internal _userLoanRecordIds;
     mapping(address => uint256) internal _collateralAmounts;
+    mapping(address => uint256) internal _totalBorrowsByCollateral;
 
     event OperatorPortalChanged(
         address indexed previousPortal,

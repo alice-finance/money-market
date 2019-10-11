@@ -189,6 +189,7 @@ contract LiquidationDelegator is IDelegator, Constants, Timeslot, Ownable {
     }
 
     struct LiquidateParams {
+        uint256 loanValue;
         uint256 participatorLength;
         uint256 participatorStake;
         uint256 penaltyLength;
@@ -202,7 +203,7 @@ contract LiquidationDelegator is IDelegator, Constants, Timeslot, Ownable {
         uint256 price
     ) internal {
         // Pre-calculate
-        LiquidateParams memory params = LiquidateParams(0, 0, 0, 0);
+        LiquidateParams memory params = LiquidateParams(0, 0, 0, 0, 0);
         params.loanValue = (targetLoan.collateralAmount * price) / MULTIPLIER;
         uint256[] memory participatorIds = new uint256[](assetInfo.numOperator);
         params.participatorLength = 0;
@@ -221,9 +222,11 @@ contract LiquidationDelegator is IDelegator, Constants, Timeslot, Ownable {
                 _baseAsset.allowance(info.operator, address(this)) >= amount &&
                 _baseAsset.balanceOf(info.operator) >= amount
             ) {
-                participatorIds[params.participatorLength] = i;
-                params.participatorLength += 1;
-                params.participatorStake += info.stakedAmount;
+                if (targetLoan.owner != info.operator) {
+                    participatorIds[params.participatorLength] = i;
+                    params.participatorLength += 1;
+                    params.participatorStake += info.stakedAmount;
+                }
             } else {
                 penaltyIds[params.penaltyLength] = i;
                 params.penaltyLength += 1;
@@ -297,14 +300,13 @@ contract LiquidationDelegator is IDelegator, Constants, Timeslot, Ownable {
             lastTimeslot < toTimeslot;
             lastTimeslot += PRICE_FEED_INTERVAL
         ) {
-            _penalizeTimeslot(asset, lastTimeslot, toTimeslot);
+            _penalizeTimeslot(asset, lastTimeslot);
         }
     }
 
-    function _penalizeTimeslot(address asset, uint256 timeslot, uint256 current)
-        internal
-    {
+    function _penalizeTimeslot(address asset, uint256 timeslot) internal {
         OperatorPortal.AssetInfo memory assetInfo = _portal.getAssetInfo(asset);
+        _lastCheckedTimeslot[asset] = timeslot;
 
         if (assetInfo.numOperator > 0) {
             OperatorPortal.OperatorInfo[] memory operatorInfo = _portal

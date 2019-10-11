@@ -64,7 +64,8 @@ contract Loan is LoanData {
         uint256 collateralAmount,
         bytes memory data
     ) public delegated returns (bool) {
-        return false;
+        _liquidate(msg.sender, recordId, amount, collateralAmount, data);
+        return true;
     }
 
     function _borrow(
@@ -122,6 +123,7 @@ contract Loan is LoanData {
         _userLoanRecordIds[account].push(recordId);
 
         _totalBorrows += balance;
+        _totalBorrowsByCollateral[record.collateral] -= balance;
         _collateralAmounts[collateral] += collateralAmount;
 
         require(
@@ -185,6 +187,10 @@ contract Loan is LoanData {
         );
 
         _totalBorrows -= record.balance + currentBalance - amount;
+        _totalBorrowsByCollateral[record.collateral] -=
+            record.balance +
+            currentBalance -
+            amount;
         record.balance = currentBalance - amount;
         record.collateralRate = collateralRate;
         record.lastTimestamp = block.timestamp;
@@ -271,6 +277,64 @@ contract Loan is LoanData {
         uint256 collateralAmount,
         bytes memory data
     ) internal returns (bool) {
-        return false;
+        require(amount > 0, "invalid amount");
+        require(recordId < _loanRecords.length, "invalid recordId");
+
+        LoanRecord storage record = _loanRecords[recordId];
+
+        require(record.owner != liquidator, "invalid owner");
+
+        require(
+            asset().balanceOf(liquidator) >= amount,
+            "insufficient asset amount"
+        );
+        require(
+            asset().allowance(liquidator, address(this)) >= amount,
+            "allowance not met"
+        );
+
+        uint256 currentBalance = _getCurrentLoanBalance(record);
+        uint256 collateralPrice = _priceSource.getLastPrice(record.collateral);
+        uint256 value = (record.collateralAmount * collateralPrice) /
+            MULTIPLIER;
+
+        require(value == amount, "invalid amount");
+
+        uint256 collateralRate = getCollateralRate(
+            currentBalance,
+            record.collateral,
+            record.collateralAmount
+        );
+
+        require(
+            collateralRate <= _defaultCollateralRate,
+            "loan is not on default"
+        );
+
+        _totalBorrows -= record.balance;
+        _totalBorrowsByCollateral[record.collateral] -= record.balance;
+        _collateralAmounts[record.collateral] -= collateralAmount;
+        record.balance = 0;
+        record.collateralRate = collateralRate;
+        record.collateralAmount = 0;
+        record.lastTimestamp = block.timestamp;
+
+        asset().transferFrom(liquidator, address(this), amount);
+        IERC20(record.collateral).transfer(liquidator, collateralAmount);
+
+        emit LoanLiquidated(
+            recordId,
+            record.owner,
+            liquidator,
+            amount,
+            record.balance,
+            record.collateral,
+            record.collateralAmount,
+            block.timestamp
+        );
+
+        emit LoanClosed(recordId, record.owner, block.timestamp);
+
+        return true;
     }
 }

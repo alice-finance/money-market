@@ -53,6 +53,8 @@ contract LoanMock is ILoan, Constants {
         emit LoanLiquidated(
             recordId,
             address(0),
+            address(0),
+            amount,
             0,
             address(0),
             collateralAmount,
