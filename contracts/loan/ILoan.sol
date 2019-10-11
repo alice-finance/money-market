@@ -81,7 +81,7 @@ interface ILoan {
         external
         view
         returns (LoanRecord[] memory);
-    function totalBorrowByCollateral(address collateral)
+    function totalBorrowsByCollateral(address collateral)
         external
         view
         returns (uint256);
@@ -91,4 +91,9 @@ interface ILoan {
         uint256 maxCollateralRate,
         bytes calldata data
     ) external view returns (LoanRecord[] memory);
+
+    function getLoanRecordsOnDefaultWithData(bytes calldata data)
+        external
+        view
+        returns (LoanRecord[] memory);
 }

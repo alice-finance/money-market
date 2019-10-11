@@ -4,6 +4,8 @@ pragma experimental ABIEncoderV2;
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "../operator/OperatorPortal.sol";
 import "./IPriceSource.sol";
+import "../liquidator/LiquidationDelegator.sol";
+import "../timeslot/Timeslot.sol";
 
 interface IExchangePriceSource {
     struct Price {
@@ -11,16 +13,20 @@ interface IExchangePriceSource {
         uint256 bid;
     }
 
-    function getPrice(
+    function getPriceAt(
         address askAssetAddress,
         address bidAssetAddress,
         uint256 timeslot
     ) external view returns (Price memory);
 }
 
-contract OperatorPriceSource is IPriceSource, IDelegator, Ownable {
-    uint256 constant PRICE_FEED_INTERVAL = 600; // 10 minutes
-
+contract OperatorPriceSource is
+    IPriceSource,
+    IDelegator,
+    Constants,
+    Timeslot,
+    Ownable
+{
     OperatorPortal internal _portal;
     IERC20 internal _baseAsset;
     IExchangePriceSource internal _exchange;
@@ -45,15 +51,16 @@ contract OperatorPriceSource is IPriceSource, IDelegator, Ownable {
     mapping(address => uint256) private _lastValidTimeslot;
     // asset => timeSlot
     mapping(address => uint256) private _firstValidTimeslot;
-    // operator => timeSlot
-    mapping(address => uint256) private _lastReportedSlot;
+    // asset => operator => timeSlot
+    mapping(address => mapping(address => uint256)) private _lastReportedSlot;
     // asset => timeSlot => isSlashed
     mapping(address => mapping(uint256 => bool)) private _isSlashedTimeslot;
+    // asset => timeSlot => isCalled
+    mapping(address => mapping(uint256 => bool)) private _isCalledLiquidator;
     // asset => operator => timeSlot => price
     mapping(address => mapping(address => mapping(uint256 => uint256))) private _operatorReportedPrice;
 
-    uint256 internal _maxIncrementRate = 10000000000000000; // 0.01;
-    uint256 internal _maxExchangeDiffRate = 100000000000000000; // 0.1;
+    uint256 internal _maxExchangeDiffRate = 150000000000000000; // 0.1;
     uint256 internal _penaltyRate = 10000000000000000; // 0.01;
 
     event OperatorPortalChanged(address indexed from, address indexed to);
@@ -65,7 +72,7 @@ contract OperatorPriceSource is IPriceSource, IDelegator, Ownable {
 
     modifier onlyOperator(address assetAddress) {
         require(
-            _portal.isOperator(msg.sender, assetAddress),
+            _portal.isOperator(assetAddress, msg.sender),
             "caller is not operator"
         );
         _;
@@ -119,16 +126,6 @@ contract OperatorPriceSource is IPriceSource, IDelegator, Ownable {
         _exchange = newExchange;
     }
 
-    function maxIncrementRate() public view returns (uint256) {
-        return _maxIncrementRate;
-    }
-
-    function setMaxIncrementRate(uint256 newRate) public onlyOwner {
-        emit MaxIncrementRateChanged(_maxIncrementRate, newRate);
-
-        _maxIncrementRate = newRate;
-    }
-
     function maxExchangeDiffRate() public view returns (uint256) {
         return _maxExchangeDiffRate;
     }
@@ -154,7 +151,7 @@ contract OperatorPriceSource is IPriceSource, IDelegator, Ownable {
         view
         returns (uint256)
     {
-        return _priceFeed[asset][_timestampToTimeslot(timestamp)];
+        return _priceFeed[asset][timestampToTimeslot(timestamp)];
     }
 
     function getLastPrice(address asset) public view returns (uint256) {
@@ -166,11 +163,27 @@ contract OperatorPriceSource is IPriceSource, IDelegator, Ownable {
         onlyOperator(asset)
         returns (bool)
     {
-        uint256 timeslot = _timestampToTimeslot(timestamp);
-        require(
-            timeslot > _lastReportedSlot[msg.sender],
-            "cannot post previous slot"
-        );
+        uint256 timeslot = timestampToTimeslot(timestamp);
+        uint256 previous = timeslot - PRICE_FEED_INTERVAL;
+
+        if (_lastReportedSlot[asset][msg.sender] > 0) {
+            require(
+                timeslot > _lastReportedSlot[asset][msg.sender],
+                "cannot post previous slot"
+            );
+        } else if (_firstValidTimeslot[asset] == 0) {
+            _firstValidTimeslot[asset] = previous;
+            _lastValidTimeslot[asset] = previous;
+            _priceFeed[asset][previous] = price;
+
+            emit PriceAccepted(asset, msg.sender, previous, price);
+        }
+
+        // validate not validated timeslots
+        if (_lastValidTimeslot[asset] < previous) {
+            _validatePendingTimeslots(asset, previous);
+        }
+
         require(_isValidPrice(asset, price, timeslot), "invalid price");
 
         uint256 dataId = _priceDataList.length;
@@ -187,23 +200,58 @@ contract OperatorPriceSource is IPriceSource, IDelegator, Ownable {
 
         emit PriceReported(asset, msg.sender, timeslot, price);
 
-        // if previous timeslot not validated
-        if (_lastValidTimeslot[asset] < timeslot - 1) {
-            _validatePendingPrices(asset);
+        return false;
+    }
+
+    function _isValidPrice(address asset, uint256 price, uint256 timeslot)
+        internal
+        view
+        returns (bool)
+    {
+        if (_firstValidTimeslot[asset] == 0) {
+            return true;
+        } else {
+            uint256 previousSlot = timeslot - PRICE_FEED_INTERVAL;
+
+            // TODO: Check with Exchange
+            IExchangePriceSource.Price memory rawPrice = _exchange.getPriceAt(
+                address(_baseAsset),
+                asset,
+                previousSlot
+            );
+            uint256 exchangePrice = (rawPrice.ask * MULTIPLIER) / rawPrice.bid;
+            uint256 exchangeGap = (exchangePrice * _maxExchangeDiffRate) /
+                MULTIPLIER;
+            uint256 maxExchangePrice = exchangePrice + exchangeGap;
+            uint256 minExchangePrice = exchangePrice > exchangeGap
+                ? exchangePrice - exchangeGap
+                : 0;
+
+            if (minExchangePrice <= price && price <= maxExchangePrice) {
+                return true;
+            }
         }
 
         return false;
     }
 
-    function validatePriceSlot(address asset, uint256 timeslot) public {}
+    function validatePendingTimeslots(address asset, uint256 timeslot) public {
+        _validatePendingTimeslots(asset, timeslot);
+    }
 
-    function _validatePendingPrices(address asset) internal returns (bool) {
-        uint256 lastTimeslot = _lastValidTimeslot[asset];
-        uint256 currentTimeslot = _timestampToTimeslot(block.timestamp);
+    function _validatePendingTimeslots(address asset, uint256 targetTimeslot)
+        internal
+        returns (bool)
+    {
+        uint256 lastTimeslot = _lastValidTimeslot[asset] + PRICE_FEED_INTERVAL;
+        uint256 currentTimeslot = timestampToTimeslot(block.timestamp);
+        if (targetTimeslot >= currentTimeslot) {
+            targetTimeslot = currentTimeslot - PRICE_FEED_INTERVAL;
+        }
 
         for (
             ;
-            lastTimeslot < currentTimeslot;
+            lastTimeslot <= targetTimeslot;
             lastTimeslot += PRICE_FEED_INTERVAL
         ) {
             _validatePriceSlot(asset, lastTimeslot);
@@ -221,9 +269,11 @@ contract OperatorPriceSource is IPriceSource, IDelegator, Ownable {
         if (priceCount > 0) {
             uint256[] storage dataIds = _priceData[asset][timeslot];
             uint256 maxPrice = 0;
+            address reporter = address(0);
             for (uint256 i = 0; i < dataIds.length; i++) {
                 if (_priceDataList[dataIds[i]].price > maxPrice) {
                     maxPrice = _priceDataList[dataIds[i]].price;
+                    reporter = _priceDataList[dataIds[i]].reporter;
                 }
             }
 
@@ -231,39 +281,52 @@ contract OperatorPriceSource is IPriceSource, IDelegator, Ownable {
 
             _lastValidTimeslot[asset] = timeslot;
 
+            emit PriceAccepted(asset, reporter, timeslot, maxPrice);
+
             return true;
         } else {
             if (!_isSlashedTimeslot[asset][timeslot]) {
-                // Slash everybody
-                OperatorPortal.AssetInfo memory assetInfo = _portal
-                    .getAssetInfo(asset);
+                // set timeslot price using previous one
+                _priceFeed[asset][timeslot] = _priceFeed[asset][timeslot -
+                    PRICE_FEED_INTERVAL];
+                _lastValidTimeslot[asset] = timeslot;
+                _isSlashedTimeslot[asset][timeslot] = true;
 
-                if (assetInfo.numOperator > 0) {
-                    OperatorPortal.OperatorInfo[] memory operatorInfo = _portal
-                        .getAllOperatorInfo(asset);
+                emit PriceAccepted(
+                    asset,
+                    address(0),
+                    timeslot,
+                    _priceFeed[asset][timeslot]
+                );
 
-                    address[] memory accountList = new address[](
-                        assetInfo.numOperator
-                    );
-                    uint256[] memory amountList = new uint256[](
-                        assetInfo.numOperator
-                    );
-
-                    for (uint256 i = 0; i < assetInfo.numOperator; i++) {
-                        accountList[i] = operatorInfo[i].operator;
-                        amountList[i] = _calculatePenalty(
-                            operatorInfo[i].stakedAmount,
-                            assetInfo.totalStakedAmount
-                        );
-                    }
-
-                    _portal.batchSlash(asset, accountList, amountList);
-                    _isSlashedTimeslot[asset][timeslot] = true;
-                }
+                // Penalize all operators
+                _penalizeAll(asset);
             }
         }
 
         return false;
+    }
+
+    function _penalizeAll(address asset) internal {
+        OperatorPortal.AssetInfo memory assetInfo = _portal.getAssetInfo(asset);
+
+        if (assetInfo.numOperator > 0) {
+            OperatorPortal.OperatorInfo[] memory operatorInfo = _portal
+                .getAllOperatorInfo(asset);
+
+            address[] memory accountList = new address[](assetInfo.numOperator);
+            uint256[] memory amountList = new uint256[](assetInfo.numOperator);
+
+            for (uint256 i = 0; i < assetInfo.numOperator; i++) {
+                accountList[i] = operatorInfo[i].operator;
+                amountList[i] = _calculatePenalty(
+                    operatorInfo[i].stakedAmount,
+                    assetInfo.totalStakedAmount
+                );
+            }
+
+            _portal.batchSlash(asset, accountList, amountList);
+        }
     }
 
     function _calculatePenalty(uint256 amount, uint256 totalAmount)
@@ -275,50 +338,8 @@ contract OperatorPriceSource is IPriceSource, IDelegator, Ownable {
             (((amount * MULTIPLIER) / totalAmount) * _penaltyRate) / MULTIPLIER;
     }
 
-    function _isValidPrice(address asset, uint256 price, uint256 timeslot)
-        internal
-        view
-        returns (bool)
-    {
-        if (_firstValidTimeslot[asset] == 0) {
-            return true;
-        } else {
-            uint256 previousSlot = timeslot - PRICE_FEED_INTERVAL;
-            uint256 maxPrice = (_priceFeed[asset][previousSlot] *
-                    _maxIncrementRate) /
-                MULTIPLIER +
-                _priceFeed[asset][previousSlot];
-
-            if (price <= maxPrice) {
-                IExchangePriceSource.Price memory rawPrice = _exchange.getPrice(
-                    asset,
-                    address(_baseAsset),
-                    previousSlot
-                );
-                uint256 exchangePrice = (rawPrice.ask * MULTIPLIER) /
-                    rawPrice.bid;
-                uint256 exchangeGap = (exchangePrice * _maxExchangeDiffRate) /
-                    MULTIPLIER;
-                uint256 maxExchangePrice = exchangePrice + exchangeGap;
-                uint256 minExchangePrice = exchangePrice > exchangeGap
-                    ? exchangePrice - exchangeGap
-                    : 0;
-
-                if (minExchangePrice <= price && price <= maxExchangePrice) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    function _timestampToTimeslot(uint256 timestamp)
-        internal
-        pure
-        returns (uint256)
-    {
-        return timestamp - (timestamp % PRICE_FEED_INTERVAL);
+    function isDelegator() public view returns (bool) {
+        return true;
     }
 
     /**
@@ -334,7 +355,7 @@ contract OperatorPriceSource is IPriceSource, IDelegator, Ownable {
         returns (bool)
     {
         operator;
-        uint256 previousTimeslot = _timestampToTimeslot(block.timestamp) -
+        uint256 previousTimeslot = timestampToTimeslot(block.timestamp) -
             PRICE_FEED_INTERVAL;
         return _lastValidTimeslot[asset] >= previousTimeslot;
     }

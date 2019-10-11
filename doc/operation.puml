@@ -26,6 +26,7 @@ IPriceSource <.down. MoneyMarket: use
 class OperatorPriceSource {
     ~ portal: OperatorPortal
     ~ exchange: IExchangePriceSource
+    ~ liquidator: ILiquidator
     --
     <<modifier>> onlyOperator
     ..
@@ -61,10 +62,11 @@ class LiquidationDelegator {
     --
     <<modifier>> onlyOperator
     ..
-    + liquidate() onlyOperator: bool
+    + liquidate(): bool
 }
 
 LiquidationDelegator .down.> OperatorPortal: delegator
+LiquidationDelegator ..> OperatorPriceSource: use
 
 class MoneyMarket {
     ~ liquidator: address

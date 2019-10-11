@@ -12,7 +12,7 @@ interface IPriceSource {
         uint256 price
     );
 
-    event PriceValidated(
+    event PriceAccepted(
         address indexed asset,
         address indexed reporter,
         uint256 indexed timeslot,

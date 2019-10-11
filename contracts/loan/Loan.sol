@@ -4,10 +4,9 @@ pragma experimental ABIEncoderV2;
 import "../savings/InvitationOnlySavings.sol";
 import "./ILoan.sol";
 import "../calculator/ILoanInterestCalculator.sol";
-import "../registry/IERC20AssetRegistry.sol";
-import "./PriceManager.sol";
+import "./LoanData.sol";
 
-contract Loan is PriceManager {
+contract Loan is LoanData {
     using SafeMath for uint256;
 
     function getCollateralRate(
@@ -15,8 +14,10 @@ contract Loan is PriceManager {
         address collateral,
         uint256 collateralAmount
     ) public view delegated returns (uint256) {
-        uint256 assetPrice = getCurrentPrice(address(asset()));
-        uint256 collateralPrice = getCurrentPrice(address(collateral));
+        uint256 assetPrice = _priceSource.getLastPrice(address(asset()));
+        uint256 collateralPrice = _priceSource.getLastPrice(
+            address(collateral)
+        );
         uint256 assetValue = amount.mul(assetPrice);
         uint256 collateralValue = collateralAmount.mul(collateralPrice);
 
@@ -36,7 +37,6 @@ contract Loan is PriceManager {
             collateralAmount,
             data
         );
-        validatePrice();
         return recordId;
     }
 
@@ -46,7 +46,6 @@ contract Loan is PriceManager {
         returns (bool)
     {
         _repay(msg.sender, recordId, amount, data);
-        validatePrice();
         return true;
     }
 
@@ -56,7 +55,6 @@ contract Loan is PriceManager {
         bytes memory data
     ) public delegated returns (bool) {
         _supplyCollateral(msg.sender, recordId, amount, data);
-        validatePrice();
         return true;
     }
 
@@ -67,10 +65,6 @@ contract Loan is PriceManager {
         bytes memory data
     ) public delegated returns (bool) {
         return false;
-    }
-
-    function validatePrice() public delegated {
-        _validatePrice();
     }
 
     function _borrow(

@@ -8,6 +8,7 @@ const ERC20 = artifacts.require("mock/token/ERC20Mock.sol");
 const MULTIPLIER = new BN(10).pow(new BN(18));
 const MINIMUM_STAKING_AMOUNT = MULTIPLIER.mul(new BN(25000000));
 const PENDING_REMOVAL_DURATION = time.duration.days(7);
+const MAX_AMOUNT = MULTIPLIER.mul(new BN(10000000000));
 const AMOUNT1 = MULTIPLIER.mul(new BN(300000000));
 const AMOUNT2 = MULTIPLIER.mul(new BN(350000000));
 const AMOUNT3 = MULTIPLIER.mul(new BN(400000000));
@@ -25,20 +26,20 @@ contract("OperatorPortal", function([admin, operator1, operator2, operator3, ope
   beforeEach(async function() {
     this.portal = await OperatorPortal.new(admin, this.alice.address, MINIMUM_STAKING_AMOUNT);
 
-    await this.alice.mint(operator1, AMOUNT1);
-    await this.alice.mint(operator2, AMOUNT2);
-    await this.alice.mint(operator3, AMOUNT3);
-    await this.alice.mint(operator4, AMOUNT4);
+    await this.alice.mint(operator1, MAX_AMOUNT);
+    await this.alice.mint(operator2, MAX_AMOUNT);
+    await this.alice.mint(operator3, MAX_AMOUNT);
+    await this.alice.mint(operator4, MAX_AMOUNT);
 
-    await this.alice.approve(this.portal.address, AMOUNT1, { from: operator1 });
-    await this.alice.approve(this.portal.address, AMOUNT2, { from: operator2 });
-    await this.alice.approve(this.portal.address, AMOUNT3, { from: operator3 });
-    await this.alice.approve(this.portal.address, AMOUNT4, { from: operator4 });
+    await this.alice.approve(this.portal.address, MAX_AMOUNT, { from: operator1 });
+    await this.alice.approve(this.portal.address, MAX_AMOUNT, { from: operator2 });
+    await this.alice.approve(this.portal.address, MAX_AMOUNT, { from: operator3 });
+    await this.alice.approve(this.portal.address, MAX_AMOUNT, { from: operator4 });
   });
 
   it("should have valid configurations", async function() {
     expect(await this.portal.minimumStakingAmount()).to.be.bignumber.equal(MINIMUM_STAKING_AMOUNT);
-    expect(await this.pendingRemovalDuration()).to.be.bignumber.equal(PENDING_REMOVAL_DURATION);
+    expect(await this.portal.pendingRemovalDuration()).to.be.bignumber.equal(PENDING_REMOVAL_DURATION);
   });
 
   describe("Stake", function() {
@@ -85,13 +86,13 @@ contract("OperatorPortal", function([admin, operator1, operator2, operator3, ope
         amount: AMOUNT_NOT_ENOUGH
       });
 
-      let totalCount = 604800 / 86400;
+      let totalCount = PENDING_REMOVAL_DURATION.div(time.duration.days(1));
       let amountPerPeriod = AMOUNT_NOT_ENOUGH.div(new BN(totalCount));
       let withdrawableBalance = await this.portal.withdrawableBalanceOf(operator1);
 
       expect(withdrawableBalance).to.be.bignumber.equal(new BN(0));
 
-      await time.increase(86400);
+      await time.increase(time.duration.days(1));
       withdrawableBalance = await this.portal.withdrawableBalanceOf(operator1);
 
       expect(withdrawableBalance).to.be.bignumber.equal(amountPerPeriod);
@@ -107,5 +108,17 @@ contract("OperatorPortal", function([admin, operator1, operator2, operator3, ope
     });
   });
 
-  describe("Delegator", function() {});
+  describe("Delegator", function() {
+    beforeEach(async function() {
+      await this.portal.addStake(this.bat.address, AMOUNT1, { from: operator1 });
+      await this.portal.addStake(this.bat.address, AMOUNT2, { from: operator2 });
+      await this.portal.addStake(this.bat.address, AMOUNT3, { from: operator3 });
+      await this.portal.addStake(this.bat.address, AMOUNT4, { from: operator4 });
+
+      await this.portal.addStake(this.rep.address, AMOUNT4, { from: operator1 });
+      await this.portal.addStake(this.rep.address, AMOUNT3, { from: operator2 });
+      await this.portal.addStake(this.rep.address, AMOUNT2, { from: operator3 });
+      await this.portal.addStake(this.rep.address, AMOUNT1, { from: operator4 });
+    });
+  });
 });

@@ -43,7 +43,7 @@ contract OperatorPortal is Ownable {
     mapping(address => address[]) internal _assetStakeholders;
 
     // operator => PendingWithdrawal
-    mapping(address => PendingWithdrawal) internal _pendingRemoval;
+    mapping(address => PendingWithdrawal[]) internal _pendingRemovalList;
 
     address[] internal _assets;
     mapping(address => bool) internal _isAsset;
@@ -95,7 +95,14 @@ contract OperatorPortal is Ownable {
         uint256 stakeAmount,
         uint256 timestamp
     );
+    event RemovalRecordCreated(
+        uint256 indexed id,
+        address indexed account,
+        uint256 amount,
+        uint256 timestamp
+    );
     event Withdrawn(
+        uint256 indexed id,
         address indexed account,
         uint256 amount,
         uint256 totalAmount,
@@ -319,7 +326,10 @@ contract OperatorPortal is Ownable {
         return true;
     }
 
-    function removeStake(address asset, uint256 amount) public returns (bool) {
+    function removeStake(address asset, uint256 amount)
+        public
+        returns (uint256)
+    {
         require(_isAllStakeRemovable(asset, msg.sender), "not unstakable");
         require(pendingBalanceOf(msg.sender) == 0, "pending amount exists");
         require(
@@ -329,10 +339,12 @@ contract OperatorPortal is Ownable {
 
         _accountStake[asset][msg.sender] -= amount;
 
-        _pendingRemoval[msg.sender].totalAmount = amount;
-        _pendingRemoval[msg.sender].remainingAmount = amount;
-        _pendingRemoval[msg.sender].startsAt = block.timestamp;
-        _pendingRemoval[msg.sender].endsAt =
+        uint256 id = _pendingRemovalList[msg.sender].length;
+        _pendingRemovalList[msg.sender].length += 1;
+        _pendingRemoval[msg.sender][id].totalAmount = amount;
+        _pendingRemoval[msg.sender][id].remainingAmount = amount;
+        _pendingRemoval[msg.sender][id].startsAt = block.timestamp;
+        _pendingRemoval[msg.sender][id].endsAt =
             block.timestamp +
             _pendingRemovalDuration;
 
@@ -356,14 +368,28 @@ contract OperatorPortal is Ownable {
             block.timestamp
         );
 
-        return true;
+        emit RemovalRecordCreated(id, msg.sender, amount, block.timestamp);
+
+        return id;
     }
 
-    function pendingBalanceOf(address operator) public view returns (uint256) {
-        return _pendingRemoval[operator].remainingAmount;
+    function pendingBalanceOf(address operator, uint256 removalId)
+        public
+        view
+        returns (uint256)
+    {
+        return _pendingRemoval[operator][removalId].remainingAmount;
     }
 
-    function withdrawableBalanceOf(address account)
+    function pendingRemovalListOf(address operator)
+        public
+        view
+        returns (PendingWithdrawal[] memory)
+    {
+        return _pendingRemoval[operator];
+    }
+
+    function withdrawableBalanceOf(address account, uint256 removalId)
         public
         view
         returns (uint256)
@@ -371,33 +397,39 @@ contract OperatorPortal is Ownable {
         uint256 totalCount = _pendingRemovalDuration / 86400;
         // duration / 1 day
         uint256 currentCount = (block.timestamp -
-                _pendingRemoval[account].startsAt) /
+                _pendingRemoval[account][removalId].startsAt) /
             86400;
         // passed / 1 day
-        uint256 eachAmount = _pendingRemoval[account].totalAmount / totalCount;
-        uint256 withdrawnAmount = _pendingRemoval[account].totalAmount -
-            _pendingRemoval[account].remainingAmount;
+        uint256 eachAmount = _pendingRemoval[account][removalId].totalAmount /
+            totalCount;
+        uint256 withdrawnAmount = _pendingRemoval[account][removalId]
+                .totalAmount -
+            _pendingRemoval[account][removalId].remainingAmount;
         uint256 withdrawableAmount = eachAmount * currentCount;
 
-        if (withdrawableAmount > _pendingRemoval[account].totalAmount) {
-            withdrawableAmount = _pendingRemoval[account].totalAmount;
+        if (
+            withdrawableAmount > _pendingRemoval[account][removalId].totalAmount
+        ) {
+            withdrawableAmount = _pendingRemoval[account][removalId]
+                .totalAmount;
         }
 
         return withdrawableAmount - withdrawnAmount;
     }
 
-    function withdraw(uint256 amount) public returns (bool) {
-        require(amount <= withdrawableBalanceOf(msg.sender));
+    function withdraw(uint256 amount, uint256 removalId) public returns (bool) {
+        require(amount <= withdrawableBalanceOf(msg.sender, removalId));
 
-        _pendingRemoval[msg.sender].remainingAmount -= amount;
+        _pendingRemoval[msg.sender][removalId].remainingAmount -= amount;
 
         require(_alice.transfer(msg.sender, amount));
 
         emit Withdrawn(
+            removalId,
             msg.sender,
             amount,
-            _pendingRemoval[msg.sender].totalAmount,
-            _pendingRemoval[msg.sender].remainingAmount,
+            _pendingRemoval[msg.sender][removalId].totalAmount,
+            _pendingRemoval[msg.sender][removalId].remainingAmount,
             block.timestamp
         );
         return false;
@@ -467,7 +499,7 @@ contract OperatorPortal is Ownable {
 
     function _slash(address asset, address operator, uint256 amount) internal {
         _accountStake[asset][operator] -= amount;
-        _accountStake[asset][operator] -= amount;
+        _assetStake[asset] -= amount;
         _totalSlashed += amount;
 
         emit StakeRemoved(

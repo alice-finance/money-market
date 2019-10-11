@@ -6,12 +6,17 @@ import "./ILoan.sol";
 import "../registry/IERC20AssetRegistry.sol";
 import "../calculator/ILoanInterestCalculator.sol";
 import "../operator/OperatorPortal.sol";
+import "../priceSource/IPriceSource.sol";
 
 contract LoanData is InvitationOnlySavings, ILoan {
     OperatorPortal internal _operatorPortal;
     IERC20AssetRegistry internal _ERC20AssetRegistry;
+    IPriceSource internal _priceSource;
     ILoanInterestCalculator internal _loanInterestCalculator;
-    uint256 internal _minimumCollateralRate;
+
+    uint256 internal _defaultCollateralRate = 1490000000000000000; // 1.49
+    uint256 internal _minimumCollateralRate = 1500000000000000000; // 1.5
+    uint256 internal _dangerCollateralRate = 1600000000000000000; // 1.6
 
     LoanRecord[] internal _loanRecords;
     mapping(address => uint256[]) internal _userLoanRecordIds;
@@ -27,12 +32,19 @@ contract LoanData is InvitationOnlySavings, ILoan {
         address indexed newCalculator
     );
 
+    event PriceSourceChanged(
+        address indexed previousPriceSource,
+        address indexed newPriceSource
+    );
+
     event ERC20AssetRegistryChanged(
         address indexed previousRegistry,
         address indexed newRegistry
     );
 
+    event DefaultCollateralRateChanged(uint256 previousRate, uint256 newRate);
     event MinimumCollateralRateChanged(uint256 previousRate, uint256 newRate);
+    event DangerCollateralRateChanged(uint256 previousRate, uint256 newRate);
 
     function operatorPortal() public view delegated returns (OperatorPortal) {
         return _operatorPortal;
@@ -98,6 +110,18 @@ contract LoanData is InvitationOnlySavings, ILoan {
         _ERC20AssetRegistry = registry;
     }
 
+    function priceSource() public view delegated returns (IPriceSource) {
+        return _priceSource;
+    }
+
+    function setPriceSource(IPriceSource source) public delegated onlyOwner {
+        require(address(source) != address(0), "ZERO address");
+
+        emit PriceSourceChanged(address(_priceSource), address(source));
+
+        _priceSource = source;
+    }
+
     function minimumCollateralRate() public view delegated returns (uint256) {
         return _minimumCollateralRate;
     }
@@ -112,6 +136,30 @@ contract LoanData is InvitationOnlySavings, ILoan {
         emit MinimumCollateralRateChanged(_minimumCollateralRate, newRate);
 
         _minimumCollateralRate = newRate;
+    }
+
+    function setDefaultCollateralRate(uint256 newRate)
+        public
+        delegated
+        onlyOwner
+    {
+        require(newRate >= MULTIPLIER, "invalid default collateral rate");
+
+        emit DefaultCollateralRateChanged(_defaultCollateralRate, newRate);
+
+        _defaultCollateralRate = newRate;
+    }
+
+    function setDangerCollateralRate(uint256 newRate)
+        public
+        delegated
+        onlyOwner
+    {
+        require(newRate >= MULTIPLIER, "invalid danger collateral rate");
+
+        emit DangerCollateralRateChanged(_dangerCollateralRate, newRate);
+
+        _dangerCollateralRate = newRate;
     }
 
     function collateralAmount(address collateral)
@@ -222,11 +270,13 @@ contract LoanData is InvitationOnlySavings, ILoan {
         delegated
         returns (uint256)
     {
+        uint256 timeDiff = block.timestamp - record.lastTimestamp;
+        timeDiff = timeDiff < 86400 ? 86400 : timeDiff;
         return
             _loanInterestCalculator.getExpectedBalance(
                 record.balance,
                 record.interestRate,
-                block.timestamp - record.lastTimestamp
+                timeDiff
             );
     }
 

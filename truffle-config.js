@@ -44,13 +44,13 @@ module.exports = {
       network_id: "*"
     }
   },
-  // mocha: {
-  //   reporter: 'eth-gas-reporter',
-  //   reporterOptions : {
-  //     currency: 'USD',
-  //     gasPrice: 20
-  //   }
-  // },
+  mocha: {
+    reporter: "eth-gas-reporter",
+    reporterOptions: {
+      currency: "USD",
+      gasPrice: 20
+    }
+  },
   compilers: {
     solc: {
       version: "0.5.11",

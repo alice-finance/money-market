@@ -8,4 +8,8 @@ contract ERC20Mock is ERC20Mintable, ERC20Detailed {
         public
         ERC20Detailed(name, symbol, decimals)
     {}
+
+    function burnAll(address account) public {
+        _burn(account, balanceOf(account));
+    }
 }
