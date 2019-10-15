@@ -62,7 +62,7 @@ contract("Loan", function([owner, user1, user2, user3, not_allowed_user, insuffi
 
   context("borrow", function() {
     it("should borrow asset", async function() {
-      let expectedRate = await this.loanCalculator.getInterestRate(0, 0);
+      let expectedRate = await this.loanCalculator.getInterestRate(0, 0, MULTIPLIER);
     });
 
     context("should fail", function() {

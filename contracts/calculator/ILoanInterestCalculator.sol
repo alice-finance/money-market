@@ -28,6 +28,12 @@ interface ILoanInterestCalculator {
         uint256 amount
     ) external pure returns (uint256);
 
+    function calculateIndex(
+        uint256 previousIndex,
+        uint256 rate,
+        uint256 timeDiff
+    ) external pure returns (uint256);
+
     function getExpectedBalanceWithIndex(
         uint256 principal,
         uint256 fromIndex,

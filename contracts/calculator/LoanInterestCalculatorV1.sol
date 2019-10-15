@@ -10,6 +10,29 @@ contract LoanInterestCalculatorV1 is
     uint256 public constant A = 99363990000000;
     uint256 public constant C = 210000000000000;
 
+    function calculateIndex(
+        uint256 previousIndex,
+        uint256 rate,
+        uint256 timeDiff
+    ) public pure returns (uint256) {
+        uint256 diff = (timeDiff * MULTIPLIER) / 86400;
+        uint256 d = diff / MULTIPLIER;
+        uint256 h = diff % MULTIPLIER;
+        uint256 newIndex = previousIndex;
+
+        for (uint256 i = 0; i < d; i++) {
+            newIndex = (newIndex * (MULTIPLIER + rate)) / MULTIPLIER;
+        }
+
+        if (h > 0) {
+            newIndex =
+                (newIndex * ((rate * h) / MULTIPLIER + MULTIPLIER)) /
+                MULTIPLIER;
+        }
+
+        return newIndex;
+    }
+
     function getExpectedBalanceWithIndex(
         uint256 principal,
         uint256 fromIndex,

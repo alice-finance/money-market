@@ -402,18 +402,14 @@ contract LoanData is InvitationOnlySavings, ILoan {
     function updateIndex(address collateral) public {
         uint256 previous = _collateralIndex[collateral];
         if (previous > 0) {
-            uint256 timeDiff = ((block.timestamp -
-                        _collateralIndexTimestamp[collateral]) *
-                    MULTIPLIER) /
-                86400;
+            uint256 timeDiff = block.timestamp -
+                _collateralIndexTimestamp[collateral];
             uint256 currentRate = _calculateCollateralLoanInterestRate(
                 MULTIPLIER,
                 collateral
             );
-            _collateralIndex[collateral] =
-                (((currentRate - MULTIPLIER) * timeDiff) / MULTIPLIER) *
-                previous +
-                previous;
+            _collateralIndex[collateral] = _loanInterestCalculator
+                .calculateIndex(previous, currentRate, timeDiff);
         } else {
             _collateralIndex[collateral] = MULTIPLIER;
         }
