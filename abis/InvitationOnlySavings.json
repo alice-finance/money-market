@@ -5,6 +5,7 @@
     "name": "MULTIPLIER",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -17,10 +18,12 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "address",
         "name": "user",
         "type": "address"
       },
       {
+        "internalType": "bytes",
         "name": "",
         "type": "bytes"
       }
@@ -28,6 +31,7 @@
     "name": "getSavingsRecordIdsWithData",
     "outputs": [
       {
+        "internalType": "uint256[]",
         "name": "",
         "type": "uint256[]"
       }
@@ -42,6 +46,7 @@
     "name": "paidInterests",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -56,6 +61,7 @@
     "name": "earnedInterests",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -68,10 +74,12 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "address",
         "name": "user",
         "type": "address"
       },
       {
+        "internalType": "bytes",
         "name": "data",
         "type": "bytes"
       }
@@ -81,34 +89,42 @@
       {
         "components": [
           {
+            "internalType": "uint256",
             "name": "id",
             "type": "uint256"
           },
           {
+            "internalType": "address",
             "name": "owner",
             "type": "address"
           },
           {
+            "internalType": "uint256",
             "name": "interestRate",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "balance",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "principal",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "initialTimestamp",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "lastTimestamp",
             "type": "uint256"
           }
         ],
+        "internalType": "struct ISavings.SavingsRecord[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -123,6 +139,7 @@
     "name": "minimumSavingsAmount",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -135,6 +152,7 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "bytes",
         "name": "",
         "type": "bytes"
       }
@@ -142,6 +160,7 @@
     "name": "savingsCalculatorWithData",
     "outputs": [
       {
+        "internalType": "contract IInterestCalculator",
         "name": "",
         "type": "address"
       }
@@ -156,6 +175,7 @@
     "name": "DECIMALS",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -170,6 +190,7 @@
     "name": "asset",
     "outputs": [
       {
+        "internalType": "contract IERC20",
         "name": "",
         "type": "address"
       }
@@ -182,10 +203,12 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       },
       {
+        "internalType": "bytes",
         "name": "",
         "type": "bytes"
       }
@@ -193,6 +216,7 @@
     "name": "getExpectedSavingsInterestRateWithData",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -205,6 +229,7 @@
     "constant": false,
     "inputs": [
       {
+        "internalType": "address",
         "name": "newLoanAddress",
         "type": "address"
       }
@@ -221,6 +246,7 @@
     "name": "totalBorrows",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -233,14 +259,17 @@
     "constant": false,
     "inputs": [
       {
+        "internalType": "uint256",
         "name": "recordId",
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       },
       {
+        "internalType": "bytes",
         "name": "data",
         "type": "bytes"
       }
@@ -248,6 +277,7 @@
     "name": "withdrawWithData",
     "outputs": [
       {
+        "internalType": "bool",
         "name": "",
         "type": "bool"
       }
@@ -260,10 +290,12 @@
     "constant": false,
     "inputs": [
       {
+        "internalType": "contract IInterestCalculator",
         "name": "calculator",
         "type": "address"
       },
       {
+        "internalType": "bytes",
         "name": "",
         "type": "bytes"
       }
@@ -278,6 +310,7 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "bytes",
         "name": "",
         "type": "bytes"
       }
@@ -285,6 +318,7 @@
     "name": "getCurrentSavingsInterestRateWithData",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -299,6 +333,7 @@
     "name": "savingsCalculator",
     "outputs": [
       {
+        "internalType": "contract IInterestCalculator",
         "name": "",
         "type": "address"
       }
@@ -313,6 +348,7 @@
     "name": "owner",
     "outputs": [
       {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
@@ -327,6 +363,7 @@
     "name": "isOwner",
     "outputs": [
       {
+        "internalType": "bool",
         "name": "",
         "type": "bool"
       }
@@ -341,6 +378,7 @@
     "name": "totalFunds",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -353,10 +391,12 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "uint256",
         "name": "recordId",
         "type": "uint256"
       },
       {
+        "internalType": "bytes",
         "name": "",
         "type": "bytes"
       }
@@ -366,34 +406,42 @@
       {
         "components": [
           {
+            "internalType": "uint256",
             "name": "id",
             "type": "uint256"
           },
           {
+            "internalType": "address",
             "name": "owner",
             "type": "address"
           },
           {
+            "internalType": "uint256",
             "name": "interestRate",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "balance",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "principal",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "initialTimestamp",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "lastTimestamp",
             "type": "uint256"
           }
         ],
+        "internalType": "struct ISavings.SavingsRecord",
         "name": "",
         "type": "tuple"
       }
@@ -406,10 +454,12 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "address",
         "name": "user",
         "type": "address"
       },
       {
+        "internalType": "bytes",
         "name": "",
         "type": "bytes"
       }
@@ -419,34 +469,42 @@
       {
         "components": [
           {
+            "internalType": "uint256",
             "name": "id",
             "type": "uint256"
           },
           {
+            "internalType": "address",
             "name": "owner",
             "type": "address"
           },
           {
+            "internalType": "uint256",
             "name": "interestRate",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "balance",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "principal",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "initialTimestamp",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "lastTimestamp",
             "type": "uint256"
           }
         ],
+        "internalType": "struct ISavings.SavingsRecord[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -459,6 +517,7 @@
     "constant": false,
     "inputs": [
       {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       }
@@ -473,10 +532,12 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       },
       {
+        "internalType": "bytes",
         "name": "",
         "type": "bytes"
       }
@@ -484,6 +545,7 @@
     "name": "getExpectedSavingsAPRWithData",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -498,6 +560,7 @@
     "name": "loan",
     "outputs": [
       {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
@@ -510,6 +573,7 @@
     "constant": false,
     "inputs": [
       {
+        "internalType": "contract IInterestCalculator",
         "name": "calculator",
         "type": "address"
       }
@@ -524,6 +588,7 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "bytes",
         "name": "",
         "type": "bytes"
       }
@@ -531,6 +596,7 @@
     "name": "getCurrentSavingsAPRWithData",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -543,6 +609,7 @@
     "constant": false,
     "inputs": [
       {
+        "internalType": "address",
         "name": "newOwner",
         "type": "address"
       }
@@ -557,10 +624,12 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "uint256",
         "name": "recordId",
         "type": "uint256"
       },
       {
+        "internalType": "bytes",
         "name": "",
         "type": "bytes"
       }
@@ -570,34 +639,42 @@
       {
         "components": [
           {
+            "internalType": "uint256",
             "name": "id",
             "type": "uint256"
           },
           {
+            "internalType": "address",
             "name": "owner",
             "type": "address"
           },
           {
+            "internalType": "uint256",
             "name": "interestRate",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "balance",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "principal",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "initialTimestamp",
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
             "name": "lastTimestamp",
             "type": "uint256"
           }
         ],
+        "internalType": "struct ISavings.SavingsRecord",
         "name": "",
         "type": "tuple"
       }
@@ -611,16 +688,19 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
         "name": "account",
         "type": "address"
       },
       {
         "indexed": false,
+        "internalType": "bytes3",
         "name": "code",
         "type": "bytes3"
       },
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "timestamp",
         "type": "uint256"
       }
@@ -633,21 +713,25 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
         "name": "inviter",
         "type": "address"
       },
       {
         "indexed": true,
+        "internalType": "bytes32",
         "name": "code",
         "type": "bytes32"
       },
       {
         "indexed": false,
+        "internalType": "address",
         "name": "account",
         "type": "address"
       },
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "timestamp",
         "type": "uint256"
       }
@@ -660,11 +744,13 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "from",
         "type": "uint256"
       },
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "to",
         "type": "uint256"
       }
@@ -677,11 +763,13 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "from",
         "type": "uint256"
       },
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "to",
         "type": "uint256"
       }
@@ -694,26 +782,31 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "recordId",
         "type": "uint256"
       },
       {
         "indexed": true,
+        "internalType": "address",
         "name": "owner",
         "type": "address"
       },
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "balance",
         "type": "uint256"
       },
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "rate",
         "type": "uint256"
       },
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "timestamp",
         "type": "uint256"
       }
@@ -726,26 +819,31 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "recordId",
         "type": "uint256"
       },
       {
         "indexed": true,
+        "internalType": "address",
         "name": "owner",
         "type": "address"
       },
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       },
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "remainingBalance",
         "type": "uint256"
       },
       {
         "indexed": false,
+        "internalType": "uint256",
         "name": "timestamp",
         "type": "uint256"
       }
@@ -758,11 +856,13 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
         "name": "previousCalculator",
         "type": "address"
       },
       {
         "indexed": true,
+        "internalType": "address",
         "name": "newCalculator",
         "type": "address"
       }
@@ -775,11 +875,13 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
         "name": "previousLoan",
         "type": "address"
       },
       {
         "indexed": true,
+        "internalType": "address",
         "name": "newLoan",
         "type": "address"
       }
@@ -792,11 +894,13 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
         "name": "previousOwner",
         "type": "address"
       },
       {
         "indexed": true,
+        "internalType": "address",
         "name": "newOwner",
         "type": "address"
       }
@@ -810,6 +914,7 @@
     "name": "amountOfSavingsPerInvite",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -822,6 +927,7 @@
     "constant": false,
     "inputs": [
       {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       }
@@ -836,6 +942,7 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "address",
         "name": "account",
         "type": "address"
       }
@@ -843,6 +950,7 @@
     "name": "inviter",
     "outputs": [
       {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
@@ -855,6 +963,7 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "address",
         "name": "account",
         "type": "address"
       }
@@ -862,6 +971,7 @@
     "name": "invitationSlots",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -874,6 +984,7 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "address",
         "name": "account",
         "type": "address"
       }
@@ -881,6 +992,7 @@
     "name": "isRedeemed",
     "outputs": [
       {
+        "internalType": "bool",
         "name": "",
         "type": "bool"
       }
@@ -893,6 +1005,7 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "address",
         "name": "account",
         "type": "address"
       }
@@ -900,6 +1013,7 @@
     "name": "redeemers",
     "outputs": [
       {
+        "internalType": "address[]",
         "name": "",
         "type": "address[]"
       }
@@ -912,6 +1026,7 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "address",
         "name": "account",
         "type": "address"
       }
@@ -919,6 +1034,7 @@
     "name": "redeemerCount",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -933,6 +1049,7 @@
     "name": "totalRedeemed",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -945,10 +1062,12 @@
     "constant": false,
     "inputs": [
       {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       },
       {
+        "internalType": "bytes",
         "name": "data",
         "type": "bytes"
       }
@@ -956,6 +1075,7 @@
     "name": "depositWithData",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -968,6 +1088,7 @@
     "constant": false,
     "inputs": [
       {
+        "internalType": "bytes",
         "name": "redeemData",
         "type": "bytes"
       }
@@ -975,6 +1096,7 @@
     "name": "redeem",
     "outputs": [
       {
+        "internalType": "bool",
         "name": "",
         "type": "bool"
       }

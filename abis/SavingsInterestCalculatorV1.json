@@ -5,6 +5,7 @@
     "name": "MULTIPLIER",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -19,6 +20,7 @@
     "name": "DECIMALS",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -31,14 +33,17 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "uint256",
         "name": "principal",
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
         "name": "rate",
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
         "name": "timeDelta",
         "type": "uint256"
       }
@@ -46,6 +51,7 @@
     "name": "getExpectedBalance",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -58,14 +64,17 @@
     "constant": true,
     "inputs": [
       {
+        "internalType": "uint256",
         "name": "totalSavings",
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       }
@@ -73,6 +82,7 @@
     "name": "getInterestRate",
     "outputs": [
       {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }

@@ -18,14 +18,6 @@ contract AssetRegistryMock is IERC20AssetRegistry {
         uint256 timestamp
     );
 
-    constructor(address portalAddress) public {
-        _portal = IOperatorPortal(portalAddress);
-    }
-
-    function isDelegator() external view returns (bool) {
-        return true;
-    }
-
     function assets() public view returns (address[] memory) {
         return _assets;
     }
