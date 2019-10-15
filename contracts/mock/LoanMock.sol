@@ -113,7 +113,7 @@ contract LoanMock is ILoan, Constants {
 
         _loans[collateral][id].id = id;
         _loans[collateral][id].owner = owner;
-        _loans[collateral][id].interestRate = MULTIPLIER;
+        _loans[collateral][id].interestIndex = MULTIPLIER;
         _loans[collateral][id].balance = amount;
         _loans[collateral][id].principal = amount;
         _loans[collateral][id].collateral = collateral;

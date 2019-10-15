@@ -1,14 +1,14 @@
 pragma solidity ^0.5.11;
 
-import "../operator/IDelegator.sol";
-import "../operator/OperatorPortal.sol";
+import "../staking/IDelegator.sol";
+import "../staking/IOperatorPortal.sol";
 
 contract DelegatorMock is IDelegator {
     bool private _isDelegator = true;
     mapping(address => mapping(address => bool)) private _removable;
-    OperatorPortal portal;
+    IOperatorPortal portal;
 
-    function setPortal(OperatorPortal newPortal) public {
+    function setPortal(IOperatorPortal newPortal) public {
         portal = newPortal;
     }
 

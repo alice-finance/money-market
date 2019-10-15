@@ -1,6 +1,6 @@
 pragma solidity ^0.5.11;
 
-import "../priceSource/IPriceSource.sol";
+import "../staking/IPriceSource.sol";
 
 contract PriceSourceMock is IPriceSource {
     mapping(address => uint256) private _price;

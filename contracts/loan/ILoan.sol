@@ -11,7 +11,6 @@ interface ILoan {
         uint256 collateralAmount,
         uint256 timestamp
     );
-
     event LoanRepaid(
         uint256 recordId,
         address indexed owner,
@@ -19,7 +18,6 @@ interface ILoan {
         uint256 remainingBalance,
         uint256 timestamp
     );
-
     event LoanCollateralSupplied(
         uint256 recordId,
         address indexed owner,
@@ -28,7 +26,6 @@ interface ILoan {
         uint256 collateralAmount,
         uint256 timestamp
     );
-
     event LoanLiquidated(
         uint256 recordId,
         address indexed owner,
@@ -39,7 +36,6 @@ interface ILoan {
         uint256 collateralAmount,
         uint256 timestamp
     );
-
     event LoanClosed(
         uint256 recordId,
         address indexed owner,
@@ -49,7 +45,7 @@ interface ILoan {
     struct LoanRecord {
         uint256 id;
         address owner;
-        uint256 interestRate;
+        uint256 interestIndex;
         uint256 balance;
         uint256 principal;
         address collateral;
@@ -79,23 +75,33 @@ interface ILoan {
         uint256 collateralAmount,
         bytes calldata data
     ) external returns (bool);
-    function getActiveLoanRecordsWithData(bytes calldata data)
-        external
-        view
-        returns (LoanRecord[] memory);
     function totalBorrowsByCollateral(address collateral)
         external
         view
         returns (uint256);
-    function getActiveLoanRecordsByCollateralWithData(
-        address collateral,
-        uint256 minCollateralRate,
-        uint256 maxCollateralRate,
-        bytes calldata data
-    ) external view returns (LoanRecord[] memory);
 
-    function getLoanRecordsOnDefaultWithData(bytes calldata data)
+    function getLoanRecordIdsWithData(address user, bytes calldata data)
+        external
+        view
+        returns (uint256[] memory);
+    function getLoanRecordsWithData(address user, bytes calldata data)
         external
         view
         returns (LoanRecord[] memory);
+    function getLoanRecordWithData(uint256 recordId, bytes calldata data)
+        external
+        view
+        returns (LoanRecord memory);
+    function getRawLoanRecordWithData(uint256 recordId, bytes calldata data)
+        external
+        view
+        returns (LoanRecord memory);
+    function getActiveLoanRecordsByCollateralWithData(
+        address collateral,
+        bytes calldata data
+    ) external view returns (LoanRecord[] memory);
+    function getDefaultLoanRecordsByCollateralWithData(
+        address collateral,
+        bytes calldata data
+    ) external view returns (LoanRecord[] memory);
 }

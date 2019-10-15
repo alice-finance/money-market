@@ -1,7 +1,7 @@
 pragma solidity ^0.5.11;
 pragma experimental ABIEncoderV2;
 
-import "./base/Constants.sol";
+import "./Constants.sol";
 
 contract Ownable is Constants {
     address internal _owner;
@@ -16,7 +16,7 @@ contract Ownable is Constants {
     }
 
     modifier onlyOwner() {
-        require(isOwner(), "Ownable: not called from the owner");
+        require(isOwner(), "not called from the owner");
         _;
     }
 

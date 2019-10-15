@@ -60,7 +60,7 @@ module.exports = {
           runs: 200
         }
       },
-      evmVersion: "byzantium" // Need to set 'byzantium' due to PlasmaChain EVM version
+      evmVersion: "constantinople" // Need to set 'byzantium' due to PlasmaChain EVM version
     }
   },
   plugins: ["truffle-security"]

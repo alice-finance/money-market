@@ -42,12 +42,4 @@ contract Upgradable is Asset {
         );
         _savingsInterestCalculator = calculator;
     }
-
-    modifier delegated() {
-        require(
-            _loan != address(0) && _loan != address(this),
-            "cannot call this contract directly"
-        );
-        _;
-    }
 }

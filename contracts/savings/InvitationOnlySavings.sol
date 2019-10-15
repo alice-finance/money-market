@@ -18,36 +18,22 @@ contract InvitationOnlySavings is
     address[] internal _inviterList;
     uint256 internal _totalRedeemed;
 
-    function amountOfSavingsPerInvite()
-        public
-        view
-        delegated
-        returns (uint256)
-    {
+    function amountOfSavingsPerInvite() public view returns (uint256) {
         return _amountOfSavingsPerInvite;
     }
 
-    function setAmountOfSavingsPerInvite(uint256 amount)
-        public
-        delegated
-        onlyOwner
-    {
-        require(amount > 0, "InvitationManager: amount is ZERO");
+    function setAmountOfSavingsPerInvite(uint256 amount) public onlyOwner {
+        require(amount > 0, "amount is ZERO");
 
         emit AmountOfSavingsPerInviteChanged(_amountOfSavingsPerInvite, amount);
         _amountOfSavingsPerInvite = amount;
     }
 
-    function inviter(address account) public view delegated returns (address) {
+    function inviter(address account) public view returns (address) {
         return _inviter[account];
     }
 
-    function invitationSlots(address account)
-        public
-        view
-        delegated
-        returns (uint256)
-    {
+    function invitationSlots(address account) public view returns (uint256) {
         SavingsRecord[] memory records = getSavingsRecordsWithData(
             account,
             new bytes(0)
@@ -65,7 +51,7 @@ contract InvitationOnlySavings is
         return 0;
     }
 
-    function isRedeemed(address account) public view delegated returns (bool) {
+    function isRedeemed(address account) public view returns (bool) {
         return _redeemed[account];
     }
 
@@ -73,22 +59,16 @@ contract InvitationOnlySavings is
         return _redeemers[account];
     }
 
-    function redeemerCount(address account)
-        public
-        view
-        delegated
-        returns (uint256)
-    {
+    function redeemerCount(address account) public view returns (uint256) {
         return _redeemers[account].length;
     }
 
-    function totalRedeemed() public view delegated returns (uint256) {
+    function totalRedeemed() public view returns (uint256) {
         return _totalRedeemed;
     }
 
     function depositWithData(uint256 amount, bytes memory data)
         public
-        delegated
         returns (uint256)
     {
         (uint8 dataType, bytes memory extractedData) = _extractData(data);
@@ -97,37 +77,27 @@ contract InvitationOnlySavings is
         }
 
         if (!isRedeemed(msg.sender)) {
-            revert("InvitationOnlySavings: not redeemed user");
+            revert("not redeemed");
         }
 
-        return super.depositWithData(amount, data);
+        require(amount >= _minimumSavingsAmount, "at least minimum amount");
+
+        return _deposit(msg.sender, amount, data);
     }
 
-    function redeem(bytes memory redeemData) public delegated returns (bool) {
+    function redeem(bytes memory redeemData) public returns (bool) {
         (bytes32 promoCode, bytes memory signature) = _extractRedeemData(
             redeemData
         );
         (address currentInviter, uint96 nonce) = _extractPromoCode(promoCode);
 
-        require(
-            _redeemed[msg.sender] != true,
-            "InvitationManager: already redeemed user"
-        );
+        require(_redeemed[msg.sender] != true, "already redeemed");
 
-        require(
-            _verifySignature(promoCode, signature),
-            "InvitationManager: wrong code"
-        );
+        require(_verifySignature(promoCode, signature), "wrong code");
 
-        require(
-            nonce <= invitationSlots(currentInviter),
-            "InvitationManager: max count reached"
-        );
+        require(nonce <= invitationSlots(currentInviter), "max redeem count");
 
-        require(
-            _nonceUsage[currentInviter][nonce] == false,
-            "InvitationManager: code already used"
-        );
+        require(_nonceUsage[currentInviter][nonce] == false, "used code");
 
         _inviter[msg.sender] = currentInviter;
         _redeemers[currentInviter].push(msg.sender);
@@ -151,7 +121,7 @@ contract InvitationOnlySavings is
         pure
         returns (bytes32, bytes memory)
     {
-        require(data.length >= 32, "InvitationManager: invalid data");
+        require(data.length >= 32, "invalid data");
         uint256 signatureLength = data.length - 32;
 
         bytes32 promoCode;
@@ -178,11 +148,8 @@ contract InvitationOnlySavings is
             bytes12(bytes32(uint256(promoCode) * uint256(2**(160))))
         );
 
-        require(
-            currentInviter != address(0),
-            "InvitationManager: invalid inviter"
-        );
-        require(nonce > 0, "InvitationManager: invalid nonce");
+        require(currentInviter != address(0), "invalid inviter");
+        require(nonce > 0, "invalid nonce");
 
         return (currentInviter, nonce);
     }

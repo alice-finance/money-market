@@ -4,11 +4,19 @@ import "./ILoanInterestCalculator.sol";
 import "./BaseInterestCalculator.sol";
 
 contract LoanInterestCalculatorV1 is
-    BaseInterestCalculator,
-    ILoanInterestCalculator
+    ILoanInterestCalculator,
+    BaseInterestCalculator
 {
     uint256 public constant A = 99363990000000;
     uint256 public constant C = 210000000000000;
+
+    function getExpectedBalanceWithIndex(
+        uint256 principal,
+        uint256 fromIndex,
+        uint256 toIndex
+    ) public pure returns (uint256) {
+        return (principal * toIndex) / fromIndex;
+    }
 
     function getInterestRate(
         uint256 totalSavings,
@@ -66,6 +74,16 @@ contract LoanInterestCalculatorV1 is
             (((params.sumOfValues * params.rate) / params.sumOfBases) *
                     params.targetBase) /
                 MULTIPLIER;
+    }
+
+    function getInterestShareRate(
+        uint256 totalSavings,
+        uint256 totalBorrows,
+        uint256 loanInterestRate,
+        uint256 amount
+    ) public pure returns (uint256) {
+        // TODO: need to implement this
+        return 50000000000000000; // 0.05
     }
 
     struct BaseCalculationParams {
